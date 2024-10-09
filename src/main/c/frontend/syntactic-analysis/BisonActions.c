@@ -147,21 +147,21 @@ Declaration * DeclarationSemanticAction(Type * type, char * varName, Assignation
 Type * IntTypeSemanticAction() {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Type * type = calloc(1, sizeof(Type));
-    type->type = INT;
+    type->type = INT_TYPE;
     return type;
-}
+} 
 
 Type * BoolTypeSemanticAction() {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Type * type = calloc(1, sizeof(Type));
-    type->type = BOOL;
+    type->type = BOOL_TYPE;
     return type;
 }
 
 Type * StringTypeSemanticAction() {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Type * type = calloc(1, sizeof(Type));
-    type->type = STRING;
+    type->type = STRING_TYPE;
     return type;
 }
 
@@ -176,7 +176,7 @@ Assignation * AssignationSemanticAction(char * varName, Expression * expression)
 Expression * ArithmeticExpressionSemanticAction(ArithmeticExpression * arithmeticExpression) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Expression * expression = calloc(1, sizeof(Expression));
-    expression->type = ARITHMETIC;
+    expression->type = ARITHMETIC_EXPR;
     expression->arithmeticExpression = arithmeticExpression;
     return expression;
 }
@@ -184,7 +184,7 @@ Expression * ArithmeticExpressionSemanticAction(ArithmeticExpression * arithmeti
 Expression * BooleanExpressionSemanticAction(BooleanExpression * booleanExpression) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Expression * expression = calloc(1, sizeof(Expression));
-    expression->type = BOOLEAN;
+    expression->type = BOOLEAN_EXPR;
     expression->booleanExpression = booleanExpression;
     return expression;
 }
@@ -192,7 +192,7 @@ Expression * BooleanExpressionSemanticAction(BooleanExpression * booleanExpressi
 Expression * StringExpressionSemanticAction(StringExpression * stringExpression) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Expression * expression = calloc(1, sizeof(Expression));
-    expression->type = STRING;
+    expression->type = STRING_EXPR;
     expression->stringExpression = stringExpression;
     return expression;
 }
@@ -236,7 +236,7 @@ ArithmeticExpression * DivisionExpressionSemanticAction(ArithmeticExpression * l
 ArithmeticExpression * VarNameArithmeticExpressionSemanticAction(char * varName) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     ArithmeticExpression * arithmeticExpression = calloc(1, sizeof(ArithmeticExpression));
-    arithmeticExpression->type = VAR;
+    arithmeticExpression->type = VAR_ARITH;
     arithmeticExpression->varName = varName;
     return arithmeticExpression;
 }
@@ -244,7 +244,7 @@ ArithmeticExpression * VarNameArithmeticExpressionSemanticAction(char * varName)
 ArithmeticExpression * IntegerArithmeticExpressionSemanticAction(int value) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     ArithmeticExpression * arithmeticExpression = calloc(1, sizeof(ArithmeticExpression));
-    arithmeticExpression->type = INT;
+    arithmeticExpression->type = INT_TYPE;
     arithmeticExpression->value = value;
     return arithmeticExpression;
 }
@@ -288,7 +288,7 @@ BooleanExpression * ComparisonExpressionSemanticAction(ArithmeticExpression * le
 BooleanExpression * VarNameBooleanExpressionSemanticAction(char * varName) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     BooleanExpression * booleanExpression = calloc(1, sizeof(BooleanExpression));
-    booleanExpression->type = VAR;
+    booleanExpression->type = VAR_BOOL;
     booleanExpression->varName = varName;
     return booleanExpression;
 }

@@ -95,7 +95,7 @@ struct Expression {
         BooleanExpression * booleanExpression;
         StringExpression * stringExpression;
     };
-    enum { ARITHMETIC, BOOLEAN, STRING } type;
+    enum ExpressionType { ARITHMETIC_EXPR, BOOLEAN_EXPR, STRING_EXPR } type;
 };
 
 struct Print {
@@ -136,7 +136,7 @@ struct ArithmeticExpression {
         char * varName;
         int value;
     };
-    enum { ADD, SUB, MUL, DIV, VAR, INT } type;
+    enum ArithmeticExpressionType { ADD, SUB, MUL, DIV, VAR_ARITH, INT_LITERAL } type;
 };
 
 struct BooleanExpression {
@@ -154,7 +154,7 @@ struct BooleanExpression {
         char * varName;
         bool value;
     };
-    enum { AND = 0, OR = 1, NOT = 2, COMPARISON = 3, VAR = 4, BOOL_LITERAL = 5  } type; 
+    enum BooleanExpressionType { AND = 0, OR = 1, NOT = 2, COMPARISON = 3, VAR_BOOL = 4, BOOL_LITERAL = 5  } type; 
 	// Manually assigning enum values because AST.c complains if I don't do it.
 };
 
@@ -190,7 +190,7 @@ struct ReturnStatement {
 };
 
 struct Type {
-    enum { INT, BOOL, STRING } type;
+    enum { INT_TYPE, BOOL_TYPE, STRING_TYPE } type;
 };
 
 /**

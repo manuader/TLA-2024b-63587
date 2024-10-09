@@ -92,13 +92,13 @@ void releaseExpression(Expression * expression) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (expression != NULL) {
 		switch (expression->type) {
-			case ARITHMETIC:
+			case ARITHMETIC_EXPR:
 				releaseArithmeticExpression(expression->arithmeticExpression);
 				break;
-			case BOOLEAN:
+			case BOOLEAN_EXPR:
 				releaseBooleanExpression(expression->booleanExpression);
 				break;
-			case STRING:
+			case STRING_EXPR:
 				releaseStringExpression(expression->stringExpression);
 				break;
 		}
@@ -166,10 +166,10 @@ void releaseArithmeticExpression(ArithmeticExpression * arithmeticExpression) {
 				releaseArithmeticExpression(arithmeticExpression->left);
 				releaseArithmeticExpression(arithmeticExpression->right);
 				break;
-			case VAR:
+			case VAR_ARITH:
 				free(arithmeticExpression->varName);
 				break;
-			case INT:
+			case INT_LITERAL:
 				// No need to free int value
 				break;
 		}
@@ -194,7 +194,7 @@ void releaseBooleanExpression(BooleanExpression * booleanExpression) {
 				releaseCompareOperator(booleanExpression->op);
 				releaseArithmeticExpression(booleanExpression->rightArith);
 				break;
-			case VAR:
+			case VAR_BOOL:
 				free(booleanExpression->varName);
 				break;
 			case BOOL_LITERAL:
