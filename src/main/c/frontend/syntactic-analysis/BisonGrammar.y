@@ -10,76 +10,170 @@
 %union {
 	/** Terminals. */
 
-	int integer;
 	Token token;
+	int integer;
+	char* string;
+	bool boolean;
 
 	/** Non-terminals. */
 
-	Constant * constant;
 	Expression * expression;
 	Factor * factor;
 	Program * program;
+	Block * block;
+	Instruction * instruction;
+	Declaration * declaration;
+	Assignation * assignation;
+	Print * print;
+	FunctionCall * functionCall;
+	Function * function;
+	Conditional * conditional;
+	Loop * loop;
+	Type * type;
+	ArithmeticExpression * arithmeticExpression;
+	BooleanExpression * booleanExpression;
+	StringExpression * stringExpression;
+	CompareOperator * compareOperator;
+	Parameters * parameters;
+	Parameter * parameter;
+	Arguments * arguments;
+	Argument * argument;
+	ReturnStatement * returnStatement;
 }
-
-/**
- * Destructors. This functions are executed after the parsing ends, so if the
- * AST must be used in the following phases of the compiler you shouldn't used
- * this approach. To use this mechanism, the AST must be translated into
- * another structure.
- *
- * @see https://www.gnu.org/software/bison/manual/html_node/Destructor-Decl.html
- */
-/*
-%destructor { releaseConstant($$); } <constant>
-%destructor { releaseExpression($$); } <expression>
-%destructor { releaseFactor($$); } <factor>
-%destructor { releaseProgram($$); } <program>
-*/
 
 /** Terminals. */
 %token <integer> INTEGER
-%token <token> ADD
-%token <token> CLOSE_PARENTHESIS
-%token <token> DIV
-%token <token> MUL
-%token <token> OPEN_PARENTHESIS
-%token <token> SUB
+%token <token> ADD SUB MUL DIV
+%token <token> AND OR NOT
+%token <token> PROGRAM INT BOOL STRING PRINT IF ELSE FOR IN RETURN
+%token <token> OPEN_PARENTHESIS CLOSE_PARENTHESIS SEMICOLON OPEN_BRACE CLOSE_BRACE COMMA EQUALS
+%token <token> GREATER_THAN LESS_THAN EQUALS_EQUALS NOT_EQUALS GREATER_EQUALS LESS_EQUALS
+%token <string> VAR_NAME FUNCTION_NAME STRING_LITERAL
+%token <boolean> BOOL_LITERAL
 
-%token <token> UNKNOWN
 
 /** Non-terminals. */
-%type <constant> constant
-%type <expression> expression
-%type <factor> factor
 %type <program> program
+%type <block> block
+%type <instruction> instructions instruction
+%type <declaration> declaration
+%type <assignation> assignation
+%type <expression> expression
+%type <print> print
+%type <functionCall> function_call
+%type <function> function
+%type <conditional> conditional
+%type <loop> loop
+%type <type> type
+%type <arithmeticExpression> arit_exp
+%type <booleanExpression> bool_exp
+%type <stringExpression> string_exp
+%type <compareOperator> compare_op
+%type <parameters> parameters
+%type <parameter> parameter
+%type <arguments> arguments
+%type <argument> argument
+%type <returnStatement> return_statement
 
-/**
- * Precedence and associativity.
- *
- * @see https://www.gnu.org/software/bison/manual/html_node/Precedence.html
- */
-%left ADD SUB
-%left MUL DIV
+%start program
 
 %%
 
-// IMPORTANT: To use λ in the following grammar, use the %empty symbol.
-
-program: expression													{ $$ = ExpressionProgramSemanticAction(currentCompilerState(), $1); }
+program: PROGRAM block                                              { $$ = ProgramSemanticAction(currentCompilerState(), $2); }
 	;
 
-expression: expression[left] ADD expression[right]					{ $$ = ArithmeticExpressionSemanticAction($left, $right, ADDITION); }
-	| expression[left] DIV expression[right]						{ $$ = ArithmeticExpressionSemanticAction($left, $right, DIVISION); }
-	| expression[left] MUL expression[right]						{ $$ = ArithmeticExpressionSemanticAction($left, $right, MULTIPLICATION); }
-	| expression[left] SUB expression[right]						{ $$ = ArithmeticExpressionSemanticAction($left, $right, SUBTRACTION); }
-	| factor														{ $$ = FactorExpressionSemanticAction($1); }
+block: OPEN_BRACE instructions CLOSE_BRACE                          { $$ = BlockSemanticAction($2); }
 	;
 
-factor: OPEN_PARENTHESIS expression CLOSE_PARENTHESIS				{ $$ = ExpressionFactorSemanticAction($2); }
-	| constant														{ $$ = ConstantFactorSemanticAction($1); }
+instructions: instruction                                           { $$ = SingleInstructionSemanticAction($1); }
+	| instruction instructions                                      { $$ = MultipleInstructionsSemanticAction($1, $2); }
 	;
 
-constant: INTEGER													{ $$ = IntegerConstantSemanticAction($1); }
+instruction: declaration SEMICOLON                                  { $$ = DeclarationInstructionSemanticAction($1); }
+	| assignation SEMICOLON                                         { $$ = AssignationInstructionSemanticAction($1); }
+	| expression SEMICOLON                                          { $$ = ExpressionInstructionSemanticAction($1); }
+	| print SEMICOLON                                               { $$ = PrintInstructionSemanticAction($1); }
+	| function_call SEMICOLON                                       { $$ = FunctionCallInstructionSemanticAction($1); }
+	| return_statement SEMICOLON                                    { $$ = ReturnStatementInstructionSemanticAction($1); }
+	| function                                                      { $$ = FunctionInstructionSemanticAction($1); }
+	| conditional                                                   { $$ = ConditionalInstructionSemanticAction($1); }
+	| loop                                                          { $$ = LoopInstructionSemanticAction($1); }
+	;
+
+declaration: type VAR_NAME assignation                              { $$ = DeclarationSemanticAction($1, $2, $3); }
+	;
+
+type: INT                                                           { $$ = IntTypeSemanticAction(); }
+	| BOOL                                                          { $$ = BoolTypeSemanticAction(); }
+	| STRING                                                        { $$ = StringTypeSemanticAction(); }
+	;
+
+assignation: VAR_NAME EQUALS expression                             { $$ = AssignationSemanticAction($1, $3); }
+	;
+
+expression: arit_exp                                                { $$ = ArithmeticExpressionSemanticAction($1); }
+	| bool_exp                                                      { $$ = BooleanExpressionSemanticAction($1); }
+	| string_exp                                                    { $$ = StringExpressionSemanticAction($1); }
+	| VAR_NAME                                                      { $$ = VarNameExpressionSemanticAction($1); }
+	;
+
+arit_exp: arit_exp ADD arit_exp                                     { $$ = AdditionExpressionSemanticAction($1, $3); }
+	| arit_exp SUB arit_exp                                         { $$ = SubtractionExpressionSemanticAction($1, $3); }
+	| arit_exp MUL arit_exp                                         { $$ = MultiplicationExpressionSemanticAction($1, $3); }
+	| arit_exp DIV arit_exp                                         { $$ = DivisionExpressionSemanticAction($1, $3); }
+	| VAR_NAME                                                      { $$ = VarNameArithmeticExpressionSemanticAction($1); }
+	| INTEGER                                                       { $$ = IntegerArithmeticExpressionSemanticAction($1); }
+	;
+
+bool_exp: bool_exp AND bool_exp                                     { $$ = AndExpressionSemanticAction($1, $3); }
+	| bool_exp OR bool_exp                                          { $$ = OrExpressionSemanticAction($1, $3); }
+	| NOT bool_exp                                                  { $$ = NotExpressionSemanticAction($2); }
+	| arit_exp compare_op arit_exp                                  { $$ = ComparisonExpressionSemanticAction($1, $2, $3); }
+	| VAR_NAME                                                      { $$ = VarNameBooleanExpressionSemanticAction($1); }
+	| BOOL_LITERAL                                                  { $$ = BoolLiteralExpressionSemanticAction($1); }
+	;
+
+string_exp: STRING_LITERAL                                          { $$ = StringLiteralExpressionSemanticAction($1); }
+	;
+
+print: PRINT OPEN_PARENTHESIS expression CLOSE_PARENTHESIS          { $$ = PrintSemanticAction($3); }
+	;
+
+function: type FUNCTION_NAME OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS block { $$ = FunctionSemanticAction($1, $2, $4, $6); }
+	;
+
+parameters: parameter                                               { $$ = SingleParameterSemanticAction($1); }
+	| parameter COMMA parameters                                    { $$ = MultipleParametersSemanticAction($1, $3); }
+	;
+
+parameter: type VAR_NAME                                            { $$ = ParameterSemanticAction($1, $2); }
+	;
+
+function_call: FUNCTION_NAME OPEN_PARENTHESIS arguments CLOSE_PARENTHESIS { $$ = FunctionCallSemanticAction($1, $3); }
+	;
+
+arguments: argument                                                 { $$ = SingleArgumentSemanticAction($1); }
+	| argument COMMA arguments                                      { $$ = MultipleArgumentsSemanticAction($1, $3); }
+	;
+
+argument: expression                                                { $$ = ArgumentSemanticAction($1); }
+	;
+
+conditional: IF OPEN_PARENTHESIS bool_exp CLOSE_PARENTHESIS block ELSE block { $$ = ConditionalSemanticAction($3, $5, $7); }
+	;
+
+loop: FOR VAR_NAME IN OPEN_PARENTHESIS arit_exp COMMA arit_exp CLOSE_PARENTHESIS block { $$ = LoopSemanticAction($2, $5, $7, $9); }
+	;
+
+compare_op: GREATER_THAN                                            { $$ = GreaterThanSemanticAction(); }
+	| LESS_THAN                                                     { $$ = LessThanSemanticAction(); }
+	| EQUALS_EQUALS                                                 { $$ = EqualsEqualsSemanticAction(); }
+	| NOT_EQUALS                                                    { $$ = NotEqualsSemanticAction(); }
+	| GREATER_EQUALS                                                { $$ = GreaterEqualsSemanticAction(); }
+	| LESS_EQUALS                                                   { $$ = LessEqualsSemanticAction(); }
+	;
+
+return_statement: RETURN expression                                 { $$ = ReturnStatementSemanticAction($2); }
 	;
 
 %%
