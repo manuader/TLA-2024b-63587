@@ -24,11 +24,21 @@ void shutdownFlexActionsModule();
 void BeginMultilineCommentLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
 void EndMultilineCommentLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
 void IgnoredLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
-
 Token ArithmeticOperatorLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);
 Token IntegerLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
 Token ParenthesisLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);
-
 Token UnknownLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
+Token KeywordLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);
+Token BooleanLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);
+Token ComparisonOperatorLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);
+Token BraceLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);
+Token PunctuationLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);
+Token AssignmentLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
+Token IdentifierLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
+void BeginStringLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
+void StringContentLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
+void EscapedCharacterLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
+Token EndStringLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
+Token UnexpectedCharacterLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
 
 #endif
