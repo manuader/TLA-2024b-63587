@@ -42,16 +42,16 @@ typedef struct Type Type;
  * Node types for the Abstract Syntax Tree (AST).
  */
 
-enum InstructionType {
-    DECLARATION_INSTRUCTION,
-    ASSIGNATION_INSTRUCTION,
-    EXPRESSION_INSTRUCTION,
-    PRINT_INSTRUCTION,
-    FUNCTION_CALL_INSTRUCTION,
-    RETURN_STATEMENT_INSTRUCTION,
-    FUNCTION_INSTRUCTION,
-    CONDITIONAL_INSTRUCTION,
-    LOOP_INSTRUCTION
+enum InstructionType_T {
+    DECLARATION_INSTRUCTION_T,
+    ASSIGNATION_INSTRUCTION_T,
+    EXPRESSION_INSTRUCTION_T,
+    PRINT_INSTRUCTION_T,
+    FUNCTION_CALL_INSTRUCTION_T,
+    RETURN_STATEMENT_INSTRUCTION_T,
+    FUNCTION_INSTRUCTION_T,
+    CONDITIONAL_INSTRUCTION_T,
+    LOOP_INSTRUCTION_T
 };
 
 struct Program {
@@ -74,7 +74,7 @@ struct Instruction {
         Conditional * conditional;
         Loop * loop;
     };
-    enum InstructionType type;
+    enum InstructionType_T type;
     Instruction * next;
 };
 
@@ -95,7 +95,7 @@ struct Expression {
         BooleanExpression * booleanExpression;
         StringExpression * stringExpression;
     };
-    enum ExpressionType { ARITHMETIC_EXPR, BOOLEAN_EXPR, STRING_EXPR } type;
+    enum ExpressionType { ARITHMETIC_EXPR_T, BOOLEAN_EXPR_T, STRING_EXPR_T } type;
 };
 
 struct Print {
@@ -135,8 +135,9 @@ struct ArithmeticExpression {
         };
         char * varName;
         int value;
+        FunctionCall * functionCall;
     };
-    enum ArithmeticExpressionType { ADD, SUB, MUL, DIV, VAR_ARITH, INT_LITERAL } type;
+    enum ArithmeticExpressionType { ADD_T, SUB_T, MUL_T, DIV_T, VAR_ARITH_T, INT_LITERAL_T, FUNC_CALL_ARITH_T } type;
 };
 
 struct BooleanExpression {
@@ -153,17 +154,22 @@ struct BooleanExpression {
         BooleanExpression * notExpr;
         char * varName;
         bool value;
+        FunctionCall * functionCall;
     };
-    enum BooleanExpressionType { AND = 0, OR = 1, NOT = 2, COMPARISON = 3, VAR_BOOL = 4, BOOL_LITERAL = 5  } type; 
-	// Manually assigning enum values because AST.c complains if I don't do it.
+    enum BooleanExpressionType { AND_T, OR_T, NOT_T, COMPARISON_T, VAR_BOOL_T, BOOL_LITERAL_T, FUNC_CALL_BOOL_T } type;
 };
 
 struct StringExpression {
-    char * value;
+    union {
+        char * value;
+        char * varName;
+        FunctionCall * functionCall;
+    };
+    enum StringExpressionType { STRING_LITERAL_T, VAR_STRING_T, FUNC_CALL_STRING_T } type;
 };
 
 struct CompareOperator {
-    enum { GREATER_THAN, LESS_THAN, EQUALS_EQUALS, NOT_EQUALS, GREATER_EQUALS, LESS_EQUALS } type;
+    enum { GREATER_THAN_T, LESS_THAN_T, EQUALS_EQUALS_T, NOT_EQUALS_T, GREATER_EQUALS_T, LESS_EQUALS_T } type;
 };
 
 struct Parameters {
@@ -190,7 +196,7 @@ struct ReturnStatement {
 };
 
 struct Type {
-    enum { INT_TYPE, BOOL_TYPE, STRING_TYPE } type;
+    enum DataType { INT_T, BOOL_T, STRING_T } type;
 };
 
 /**

@@ -18,7 +18,6 @@
 	/** Non-terminals. */
 
 	Expression * expression;
-	Factor * factor;
 	Program * program;
 	Block * block;
 	Instruction * instruction;
@@ -42,7 +41,7 @@
 }
 
 /** Terminals. */
-%token <integer> INTEGER
+%token <integer> INTEGER_LITERAL
 %token <token> ADD SUB MUL DIV
 %token <token> AND OR NOT
 %token <token> PROGRAM INT BOOL STRING PRINT IF ELSE FOR IN RETURN
@@ -114,26 +113,29 @@ assignation: VAR_NAME EQUALS expression                             { $$ = Assig
 expression: arit_exp                                                { $$ = ArithmeticExpressionSemanticAction($1); }
 	| bool_exp                                                      { $$ = BooleanExpressionSemanticAction($1); }
 	| string_exp                                                    { $$ = StringExpressionSemanticAction($1); }
-	| VAR_NAME                                                      { $$ = VarNameExpressionSemanticAction($1); }
 	;
 
-arit_exp: arit_exp ADD arit_exp                                     { $$ = AdditionExpressionSemanticAction($1, $3); }
+arit_exp: INTEGER_LITERAL                                           { $$ = IntegerArithmeticExpressionSemanticAction($1); }
+	| VAR_NAME                                                      { $$ = VarNameArithmeticExpressionSemanticAction($1); }
+	| function_call                                                 { $$ = FunctionCallArithmeticExpressionSemanticAction($1); }
+	| arit_exp ADD arit_exp                                     	{ $$ = AdditionExpressionSemanticAction($1, $3); }
 	| arit_exp SUB arit_exp                                         { $$ = SubtractionExpressionSemanticAction($1, $3); }
 	| arit_exp MUL arit_exp                                         { $$ = MultiplicationExpressionSemanticAction($1, $3); }
 	| arit_exp DIV arit_exp                                         { $$ = DivisionExpressionSemanticAction($1, $3); }
-	| VAR_NAME                                                      { $$ = VarNameArithmeticExpressionSemanticAction($1); }
-	| INTEGER                                                       { $$ = IntegerArithmeticExpressionSemanticAction($1); }
 	;
 
-bool_exp: bool_exp AND bool_exp                                     { $$ = AndExpressionSemanticAction($1, $3); }
+bool_exp: BOOL_LITERAL                                              { $$ = BoolLiteralExpressionSemanticAction($1); }
+	| VAR_NAME                                                      { $$ = VarNameBooleanExpressionSemanticAction($1); }
+	| function_call                                                 { $$ = FunctionCallBooleanExpressionSemanticAction($1); }
+	| bool_exp AND bool_exp                                     	{ $$ = AndExpressionSemanticAction($1, $3); }
 	| bool_exp OR bool_exp                                          { $$ = OrExpressionSemanticAction($1, $3); }
 	| NOT bool_exp                                                  { $$ = NotExpressionSemanticAction($2); }
 	| arit_exp compare_op arit_exp                                  { $$ = ComparisonExpressionSemanticAction($1, $2, $3); }
-	| VAR_NAME                                                      { $$ = VarNameBooleanExpressionSemanticAction($1); }
-	| BOOL_LITERAL                                                  { $$ = BoolLiteralExpressionSemanticAction($1); }
 	;
 
 string_exp: STRING_LITERAL                                          { $$ = StringLiteralExpressionSemanticAction($1); }
+	| VAR_NAME                                                      { $$ = VarNameStringExpressionSemanticAction($1); }
+	| function_call                                                 { $$ = FunctionCallStringExpressionSemanticAction($1); }
 	;
 
 print: PRINT OPEN_PARENTHESIS expression CLOSE_PARENTHESIS          { $$ = PrintSemanticAction($3); }

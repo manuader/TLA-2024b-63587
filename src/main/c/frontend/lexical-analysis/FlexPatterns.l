@@ -78,6 +78,5 @@
 <STRING>.							{ return UnexpectedCharacterLexemeAction(createLexicalAnalyzerContext()); }
 
 [[:space:]]+						{ IgnoredLexemeAction(createLexicalAnalyzerContext()); }
-.									{ return UnknownLexemeAction(createLexicalAnalyzerContext()); }
 
 %%

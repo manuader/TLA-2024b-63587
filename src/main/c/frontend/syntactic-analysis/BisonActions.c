@@ -66,7 +66,7 @@ Instruction * MultipleInstructionsSemanticAction(Instruction * instruction, Inst
 Instruction * DeclarationInstructionSemanticAction(Declaration * declaration) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Instruction * instruction = calloc(1, sizeof(Instruction));
-    instruction->type = DECLARATION_INSTRUCTION;
+    instruction->type = DECLARATION_INSTRUCTION_T;
     instruction->declaration = declaration;
     return instruction;
 }
@@ -74,7 +74,7 @@ Instruction * DeclarationInstructionSemanticAction(Declaration * declaration) {
 Instruction * AssignationInstructionSemanticAction(Assignation * assignation) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Instruction * instruction = calloc(1, sizeof(Instruction));
-    instruction->type = ASSIGNATION_INSTRUCTION;
+    instruction->type = ASSIGNATION_INSTRUCTION_T;
     instruction->assignation = assignation;
     return instruction;
 }
@@ -82,7 +82,7 @@ Instruction * AssignationInstructionSemanticAction(Assignation * assignation) {
 Instruction * ExpressionInstructionSemanticAction(Expression * expression) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Instruction * instruction = calloc(1, sizeof(Instruction));
-    instruction->type = EXPRESSION_INSTRUCTION;
+    instruction->type = EXPRESSION_INSTRUCTION_T;
     instruction->expression = expression;
     return instruction;
 }
@@ -90,7 +90,7 @@ Instruction * ExpressionInstructionSemanticAction(Expression * expression) {
 Instruction * PrintInstructionSemanticAction(Print * print) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Instruction * instruction = calloc(1, sizeof(Instruction));
-    instruction->type = PRINT_INSTRUCTION;
+    instruction->type = PRINT_INSTRUCTION_T;
     instruction->print = print;
     return instruction;
 }
@@ -98,7 +98,7 @@ Instruction * PrintInstructionSemanticAction(Print * print) {
 Instruction * FunctionCallInstructionSemanticAction(FunctionCall * functionCall) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Instruction * instruction = calloc(1, sizeof(Instruction));
-    instruction->type = FUNCTION_CALL_INSTRUCTION;
+    instruction->type = FUNCTION_CALL_INSTRUCTION_T;
     instruction->functionCall = functionCall;
     return instruction;
 }
@@ -106,7 +106,7 @@ Instruction * FunctionCallInstructionSemanticAction(FunctionCall * functionCall)
 Instruction * ReturnStatementInstructionSemanticAction(ReturnStatement * returnStatement) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Instruction * instruction = calloc(1, sizeof(Instruction));
-    instruction->type = RETURN_STATEMENT_INSTRUCTION;
+    instruction->type = RETURN_STATEMENT_INSTRUCTION_T;
     instruction->returnStatement = returnStatement;
     return instruction;
 }
@@ -114,7 +114,7 @@ Instruction * ReturnStatementInstructionSemanticAction(ReturnStatement * returnS
 Instruction * FunctionInstructionSemanticAction(Function * function) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Instruction * instruction = calloc(1, sizeof(Instruction));
-    instruction->type = FUNCTION_INSTRUCTION;
+    instruction->type = FUNCTION_INSTRUCTION_T;
     instruction->function = function;
     return instruction;
 }
@@ -122,7 +122,7 @@ Instruction * FunctionInstructionSemanticAction(Function * function) {
 Instruction * ConditionalInstructionSemanticAction(Conditional * conditional) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Instruction * instruction = calloc(1, sizeof(Instruction));
-    instruction->type = CONDITIONAL_INSTRUCTION;
+    instruction->type = CONDITIONAL_INSTRUCTION_T;
     instruction->conditional = conditional;
     return instruction;
 }
@@ -130,7 +130,7 @@ Instruction * ConditionalInstructionSemanticAction(Conditional * conditional) {
 Instruction * LoopInstructionSemanticAction(Loop * loop) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Instruction * instruction = calloc(1, sizeof(Instruction));
-    instruction->type = LOOP_INSTRUCTION;
+    instruction->type = LOOP_INSTRUCTION_T;
     instruction->loop = loop;
     return instruction;
 }
@@ -147,21 +147,21 @@ Declaration * DeclarationSemanticAction(Type * type, char * varName, Assignation
 Type * IntTypeSemanticAction() {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Type * type = calloc(1, sizeof(Type));
-    type->type = INT_TYPE;
+    type->type = INT_T;
     return type;
-} 
+}
 
 Type * BoolTypeSemanticAction() {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Type * type = calloc(1, sizeof(Type));
-    type->type = BOOL_TYPE;
+    type->type = BOOL_T;
     return type;
 }
 
 Type * StringTypeSemanticAction() {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Type * type = calloc(1, sizeof(Type));
-    type->type = STRING_TYPE;
+    type->type = STRING_T;
     return type;
 }
 
@@ -176,7 +176,7 @@ Assignation * AssignationSemanticAction(char * varName, Expression * expression)
 Expression * ArithmeticExpressionSemanticAction(ArithmeticExpression * arithmeticExpression) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Expression * expression = calloc(1, sizeof(Expression));
-    expression->type = ARITHMETIC_EXPR;
+    expression->type = ARITHMETIC_EXPR_T;
     expression->arithmeticExpression = arithmeticExpression;
     return expression;
 }
@@ -184,7 +184,7 @@ Expression * ArithmeticExpressionSemanticAction(ArithmeticExpression * arithmeti
 Expression * BooleanExpressionSemanticAction(BooleanExpression * booleanExpression) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Expression * expression = calloc(1, sizeof(Expression));
-    expression->type = BOOLEAN_EXPR;
+    expression->type = BOOLEAN_EXPR_T;
     expression->booleanExpression = booleanExpression;
     return expression;
 }
@@ -192,7 +192,7 @@ Expression * BooleanExpressionSemanticAction(BooleanExpression * booleanExpressi
 Expression * StringExpressionSemanticAction(StringExpression * stringExpression) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Expression * expression = calloc(1, sizeof(Expression));
-    expression->type = STRING_EXPR;
+    expression->type = STRING_EXPR_T;
     expression->stringExpression = stringExpression;
     return expression;
 }
@@ -200,16 +200,24 @@ Expression * StringExpressionSemanticAction(StringExpression * stringExpression)
 ArithmeticExpression * AdditionExpressionSemanticAction(ArithmeticExpression * left, ArithmeticExpression * right) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     ArithmeticExpression * arithmeticExpression = calloc(1, sizeof(ArithmeticExpression));
-    arithmeticExpression->type = ADD;
+    arithmeticExpression->type = ADD_T;
     arithmeticExpression->left = left;
     arithmeticExpression->right = right;
+    return arithmeticExpression;
+}
+
+ArithmeticExpression * FunctionCallArithmeticExpressionSemanticAction(FunctionCall * functionCall) {
+    _logSyntacticAnalyzerAction(__FUNCTION__);
+    ArithmeticExpression * arithmeticExpression = calloc(1, sizeof(ArithmeticExpression));
+    arithmeticExpression->type = FUNC_CALL_ARITH_T;
+    arithmeticExpression->functionCall = functionCall;
     return arithmeticExpression;
 }
 
 ArithmeticExpression * SubtractionExpressionSemanticAction(ArithmeticExpression * left, ArithmeticExpression * right) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     ArithmeticExpression * arithmeticExpression = calloc(1, sizeof(ArithmeticExpression));
-    arithmeticExpression->type = SUB;
+    arithmeticExpression->type = SUB_T;
     arithmeticExpression->left = left;
     arithmeticExpression->right = right;
     return arithmeticExpression;
@@ -218,7 +226,7 @@ ArithmeticExpression * SubtractionExpressionSemanticAction(ArithmeticExpression 
 ArithmeticExpression * MultiplicationExpressionSemanticAction(ArithmeticExpression * left, ArithmeticExpression * right) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     ArithmeticExpression * arithmeticExpression = calloc(1, sizeof(ArithmeticExpression));
-    arithmeticExpression->type = MUL;
+    arithmeticExpression->type = MUL_T;
     arithmeticExpression->left = left;
     arithmeticExpression->right = right;
     return arithmeticExpression;
@@ -227,7 +235,7 @@ ArithmeticExpression * MultiplicationExpressionSemanticAction(ArithmeticExpressi
 ArithmeticExpression * DivisionExpressionSemanticAction(ArithmeticExpression * left, ArithmeticExpression * right) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     ArithmeticExpression * arithmeticExpression = calloc(1, sizeof(ArithmeticExpression));
-    arithmeticExpression->type = DIV;
+    arithmeticExpression->type = DIV_T;
     arithmeticExpression->left = left;
     arithmeticExpression->right = right;
     return arithmeticExpression;
@@ -236,7 +244,7 @@ ArithmeticExpression * DivisionExpressionSemanticAction(ArithmeticExpression * l
 ArithmeticExpression * VarNameArithmeticExpressionSemanticAction(char * varName) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     ArithmeticExpression * arithmeticExpression = calloc(1, sizeof(ArithmeticExpression));
-    arithmeticExpression->type = VAR_ARITH;
+    arithmeticExpression->type = VAR_ARITH_T;
     arithmeticExpression->varName = varName;
     return arithmeticExpression;
 }
@@ -244,15 +252,31 @@ ArithmeticExpression * VarNameArithmeticExpressionSemanticAction(char * varName)
 ArithmeticExpression * IntegerArithmeticExpressionSemanticAction(int value) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     ArithmeticExpression * arithmeticExpression = calloc(1, sizeof(ArithmeticExpression));
-    arithmeticExpression->type = INT_TYPE;
+    arithmeticExpression->type = INT_LITERAL_T;
     arithmeticExpression->value = value;
     return arithmeticExpression;
+}
+
+BooleanExpression * VarNameBooleanExpressionSemanticAction(char * varName) {
+    _logSyntacticAnalyzerAction(__FUNCTION__);
+    BooleanExpression * booleanExpression = calloc(1, sizeof(BooleanExpression));
+    booleanExpression->type = VAR_BOOL_T;
+    booleanExpression->varName = varName;
+    return booleanExpression;
+}
+
+BooleanExpression * FunctionCallBooleanExpressionSemanticAction(FunctionCall * functionCall) {
+    _logSyntacticAnalyzerAction(__FUNCTION__);
+    BooleanExpression * booleanExpression = calloc(1, sizeof(BooleanExpression));
+    booleanExpression->type = FUNC_CALL_BOOL_T;
+    booleanExpression->functionCall = functionCall;
+    return booleanExpression;
 }
 
 BooleanExpression * AndExpressionSemanticAction(BooleanExpression * left, BooleanExpression * right) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     BooleanExpression * booleanExpression = calloc(1, sizeof(BooleanExpression));
-    booleanExpression->type = AND;
+    booleanExpression->type = AND_T;
     booleanExpression->left = left;
     booleanExpression->right = right;
     return booleanExpression;
@@ -261,7 +285,7 @@ BooleanExpression * AndExpressionSemanticAction(BooleanExpression * left, Boolea
 BooleanExpression * OrExpressionSemanticAction(BooleanExpression * left, BooleanExpression * right) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     BooleanExpression * booleanExpression = calloc(1, sizeof(BooleanExpression));
-    booleanExpression->type = OR;
+    booleanExpression->type = OR_T;
     booleanExpression->left = left;
     booleanExpression->right = right;
     return booleanExpression;
@@ -270,7 +294,7 @@ BooleanExpression * OrExpressionSemanticAction(BooleanExpression * left, Boolean
 BooleanExpression * NotExpressionSemanticAction(BooleanExpression * expression) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     BooleanExpression * booleanExpression = calloc(1, sizeof(BooleanExpression));
-    booleanExpression->type = NOT;
+    booleanExpression->type = NOT_T;
     booleanExpression->notExpr = expression;
     return booleanExpression;
 }
@@ -278,27 +302,35 @@ BooleanExpression * NotExpressionSemanticAction(BooleanExpression * expression) 
 BooleanExpression * ComparisonExpressionSemanticAction(ArithmeticExpression * left, CompareOperator * op, ArithmeticExpression * right) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     BooleanExpression * booleanExpression = calloc(1, sizeof(BooleanExpression));
-    booleanExpression->type = COMPARISON;
+    booleanExpression->type = COMPARISON_T;
     booleanExpression->leftArith = left;
     booleanExpression->op = op;
     booleanExpression->rightArith = right;
     return booleanExpression;
 }
 
-BooleanExpression * VarNameBooleanExpressionSemanticAction(char * varName) {
-    _logSyntacticAnalyzerAction(__FUNCTION__);
-    BooleanExpression * booleanExpression = calloc(1, sizeof(BooleanExpression));
-    booleanExpression->type = VAR_BOOL;
-    booleanExpression->varName = varName;
-    return booleanExpression;
-}
-
 BooleanExpression * BoolLiteralExpressionSemanticAction(bool value) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     BooleanExpression * booleanExpression = calloc(1, sizeof(BooleanExpression));
-    booleanExpression->type = BOOL_LITERAL;
+    booleanExpression->type = BOOL_LITERAL_T;
     booleanExpression->value = value;
     return booleanExpression;
+}
+
+StringExpression * VarNameStringExpressionSemanticAction(char * varName) {
+    _logSyntacticAnalyzerAction(__FUNCTION__);
+    StringExpression * stringExpression = calloc(1, sizeof(StringExpression));
+    stringExpression->type = VAR_STRING_T;
+    stringExpression->varName = varName;
+    return stringExpression;
+}
+ 
+StringExpression * FunctionCallStringExpressionSemanticAction(FunctionCall * functionCall) {
+    _logSyntacticAnalyzerAction(__FUNCTION__);
+    StringExpression * stringExpression = calloc(1, sizeof(StringExpression));
+    stringExpression->type = FUNC_CALL_STRING_T;
+    stringExpression->functionCall = functionCall;
+    return stringExpression;
 }
 
 StringExpression * StringLiteralExpressionSemanticAction(char * value) {
@@ -402,42 +434,42 @@ Loop * LoopSemanticAction(char * varName, ArithmeticExpression * start, Arithmet
 CompareOperator * GreaterThanSemanticAction() {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     CompareOperator * op = calloc(1, sizeof(CompareOperator));
-    op->type = GREATER_THAN;
+    op->type = GREATER_THAN_T;
     return op;
 }
 
 CompareOperator * LessThanSemanticAction() {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     CompareOperator * op = calloc(1, sizeof(CompareOperator));
-    op->type = LESS_THAN;
+    op->type = LESS_THAN_T;
     return op;
 }
 
 CompareOperator * EqualsEqualsSemanticAction() {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     CompareOperator * op = calloc(1, sizeof(CompareOperator));
-    op->type = EQUALS_EQUALS;
+    op->type = EQUALS_EQUALS_T;
     return op;
 }
 
 CompareOperator * NotEqualsSemanticAction() {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     CompareOperator * op = calloc(1, sizeof(CompareOperator));
-    op->type = NOT_EQUALS;
+    op->type = NOT_EQUALS_T;
     return op;
 }
 
 CompareOperator * GreaterEqualsSemanticAction() {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     CompareOperator * op = calloc(1, sizeof(CompareOperator));
-    op->type = GREATER_EQUALS;
+    op->type = GREATER_EQUALS_T;
     return op;
 }
 
 CompareOperator * LessEqualsSemanticAction() {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     CompareOperator * op = calloc(1, sizeof(CompareOperator));
-    op->type = LESS_EQUALS;
+    op->type = LESS_EQUALS_T;
     return op;
 }
 

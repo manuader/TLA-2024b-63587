@@ -14,7 +14,7 @@
 /** Initialize module's internal state. */
 void initializeFlexActionsModule();
 
-/** Shutdown module's internal state. */
+/** Shutdown module's internal state. */ 
 void shutdownFlexActionsModule();
 
 /**
