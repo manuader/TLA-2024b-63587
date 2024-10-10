@@ -50,7 +50,6 @@
 %token <string> VAR_NAME FUNCTION_NAME STRING_LITERAL
 %token <boolean> BOOL_LITERAL
 
-
 /** Non-terminals. */
 %type <program> program
 %type <block> block
@@ -76,6 +75,15 @@
 
 %start program
 
+/* Precedence rules */
+%left OR
+%left AND
+%left EQUALS_EQUALS NOT_EQUALS
+%left LESS_THAN GREATER_THAN LESS_EQUALS GREATER_EQUALS
+%left ADD SUB
+%left MUL DIV
+%right NOT
+
 %%
 
 program: PROGRAM block                                              { $$ = ProgramSemanticAction(currentCompilerState(), $2); }
@@ -90,7 +98,6 @@ instructions: instruction                                           { $$ = Singl
 
 instruction: declaration SEMICOLON                                  { $$ = DeclarationInstructionSemanticAction($1); }
 	| assignation SEMICOLON                                         { $$ = AssignationInstructionSemanticAction($1); }
-	| expression SEMICOLON                                          { $$ = ExpressionInstructionSemanticAction($1); }
 	| print SEMICOLON                                               { $$ = PrintInstructionSemanticAction($1); }
 	| function_call SEMICOLON                                       { $$ = FunctionCallInstructionSemanticAction($1); }
 	| return_statement SEMICOLON                                    { $$ = ReturnStatementInstructionSemanticAction($1); }
@@ -99,7 +106,7 @@ instruction: declaration SEMICOLON                                  { $$ = Decla
 	| loop                                                          { $$ = LoopInstructionSemanticAction($1); }
 	;
 
-declaration: type VAR_NAME assignation                              { $$ = DeclarationSemanticAction($1, $2, $3); }
+declaration: type assignation                             			{ $$ = DeclarationSemanticAction($1, $2); }
 	;
 
 type: INT                                                           { $$ = IntTypeSemanticAction(); }
@@ -109,6 +116,7 @@ type: INT                                                           { $$ = IntTy
 
 assignation: VAR_NAME EQUALS expression                             { $$ = AssignationSemanticAction($1, $3); }
 	;
+	
 
 expression: arit_exp                                                { $$ = ArithmeticExpressionSemanticAction($1); }
 	| bool_exp                                                      { $$ = BooleanExpressionSemanticAction($1); }
@@ -122,6 +130,7 @@ arit_exp: INTEGER_LITERAL                                           { $$ = Integ
 	| arit_exp SUB arit_exp                                         { $$ = SubtractionExpressionSemanticAction($1, $3); }
 	| arit_exp MUL arit_exp                                         { $$ = MultiplicationExpressionSemanticAction($1, $3); }
 	| arit_exp DIV arit_exp                                         { $$ = DivisionExpressionSemanticAction($1, $3); }
+	| OPEN_PARENTHESIS arit_exp CLOSE_PARENTHESIS                   { $$ = $2; }
 	;
 
 bool_exp: BOOL_LITERAL                                              { $$ = BoolLiteralExpressionSemanticAction($1); }
@@ -131,6 +140,7 @@ bool_exp: BOOL_LITERAL                                              { $$ = BoolL
 	| bool_exp OR bool_exp                                          { $$ = OrExpressionSemanticAction($1, $3); }
 	| NOT bool_exp                                                  { $$ = NotExpressionSemanticAction($2); }
 	| arit_exp compare_op arit_exp                                  { $$ = ComparisonExpressionSemanticAction($1, $2, $3); }
+	| OPEN_PARENTHESIS bool_exp CLOSE_PARENTHESIS                   { $$ = $2; }
 	;
 
 string_exp: STRING_LITERAL                                          { $$ = StringLiteralExpressionSemanticAction($1); }
@@ -142,6 +152,7 @@ print: PRINT OPEN_PARENTHESIS expression CLOSE_PARENTHESIS          { $$ = Print
 	;
 
 function: type FUNCTION_NAME OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS block { $$ = FunctionSemanticAction($1, $2, $4, $6); }
+	| type FUNCTION_NAME OPEN_PARENTHESIS CLOSE_PARENTHESIS block 	 			 { $$ = FunctionSemanticAction($1, $2, NULL, $5); }
 	;
 
 parameters: parameter                                               { $$ = SingleParameterSemanticAction($1); }
@@ -152,6 +163,7 @@ parameter: type VAR_NAME                                            { $$ = Param
 	;
 
 function_call: FUNCTION_NAME OPEN_PARENTHESIS arguments CLOSE_PARENTHESIS { $$ = FunctionCallSemanticAction($1, $3); }
+	| FUNCTION_NAME OPEN_PARENTHESIS CLOSE_PARENTHESIS					  { $$ = FunctionCallSemanticAction($1, NULL); }
 	;
 
 arguments: argument                                                 { $$ = SingleArgumentSemanticAction($1); }

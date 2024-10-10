@@ -32,7 +32,7 @@ Instruction * ReturnStatementInstructionSemanticAction(ReturnStatement * returnS
 Instruction * FunctionInstructionSemanticAction(Function * function);
 Instruction * ConditionalInstructionSemanticAction(Conditional * conditional);
 Instruction * LoopInstructionSemanticAction(Loop * loop);
-Declaration * DeclarationSemanticAction(Type * type, char * varName, Assignation * assignation);
+Declaration * DeclarationSemanticAction(Type * type, Assignation * assignation);
 Type * IntTypeSemanticAction();
 Type * BoolTypeSemanticAction();
 Type * StringTypeSemanticAction();

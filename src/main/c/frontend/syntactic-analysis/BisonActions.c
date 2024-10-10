@@ -135,11 +135,11 @@ Instruction * LoopInstructionSemanticAction(Loop * loop) {
     return instruction;
 }
 
-Declaration * DeclarationSemanticAction(Type * type, char * varName, Assignation * assignation) {
+Declaration * DeclarationSemanticAction(Type * type, Assignation * assignation) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Declaration * declaration = calloc(1, sizeof(Declaration));
     declaration->type = type;
-    declaration->varName = varName;
+    declaration->varName = assignation->varName;
     declaration->assignation = assignation;
     return declaration;
 }
