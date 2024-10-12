@@ -25,7 +25,6 @@ Instruction * SingleInstructionSemanticAction(Instruction * instruction);
 Instruction * MultipleInstructionsSemanticAction(Instruction * instruction, Instruction * instructions);
 Instruction * DeclarationInstructionSemanticAction(Declaration * declaration);
 Instruction * AssignationInstructionSemanticAction(Assignation * assignation);
-Instruction * ExpressionInstructionSemanticAction(Expression * expression);
 Instruction * PrintInstructionSemanticAction(Print * print);
 Instruction * FunctionCallInstructionSemanticAction(FunctionCall * functionCall);
 Instruction * ReturnStatementInstructionSemanticAction(ReturnStatement * returnStatement);
@@ -40,7 +39,6 @@ Assignation * AssignationSemanticAction(char * varName, Expression * expression)
 Expression * ArithmeticExpressionSemanticAction(ArithmeticExpression * arithmeticExpression);
 Expression * BooleanExpressionSemanticAction(BooleanExpression * booleanExpression);
 Expression * StringExpressionSemanticAction(StringExpression * stringExpression);
-Expression * VarNameExpressionSemanticAction(char * varName);
 ArithmeticExpression * AdditionExpressionSemanticAction(ArithmeticExpression * left, ArithmeticExpression * right);
 ArithmeticExpression * SubtractionExpressionSemanticAction(ArithmeticExpression * left, ArithmeticExpression * right);
 ArithmeticExpression * MultiplicationExpressionSemanticAction(ArithmeticExpression * left, ArithmeticExpression * right);
@@ -63,7 +61,7 @@ Function * FunctionSemanticAction(Type * returnType, char * functionName, Parame
 Parameters * SingleParameterSemanticAction(Parameter * parameter);
 Parameters * MultipleParametersSemanticAction(Parameter * parameter, Parameters * parameters);
 Parameter * ParameterSemanticAction(Type * type, char * varName);
-FunctionCall * FunctionCallSemanticAction(char * functionName, Arguments * arguments);
+FunctionCall * FunctionCallSemanticAction(char * functionName, Arguments * arguments, Type * returnType);
 Arguments * SingleArgumentSemanticAction(Argument * argument);
 Arguments * MultipleArgumentsSemanticAction(Argument * argument, Arguments * arguments);
 Argument * ArgumentSemanticAction(Expression * expression);

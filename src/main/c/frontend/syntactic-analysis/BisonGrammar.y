@@ -48,6 +48,8 @@
 %token <token> OPEN_PARENTHESIS CLOSE_PARENTHESIS SEMICOLON OPEN_BRACE CLOSE_BRACE COMMA EQUALS
 %token <token> GREATER_THAN LESS_THAN EQUALS_EQUALS NOT_EQUALS GREATER_EQUALS LESS_EQUALS
 %token <string> VAR_NAME FUNCTION_NAME STRING_LITERAL
+%token <string> INT_VAR_NAME BOOL_VAR_NAME STRING_VAR_NAME
+%token <string> INT_FUNCTION_NAME BOOL_FUNCTION_NAME STRING_FUNCTION_NAME
 %token <boolean> BOOL_LITERAL
 
 /** Non-terminals. */
@@ -58,7 +60,7 @@
 %type <assignation> assignation
 %type <expression> expression
 %type <print> print
-%type <functionCall> function_call
+%type <functionCall> function_call int_function_call bool_function_call string_function_call
 %type <function> function
 %type <conditional> conditional
 %type <loop> loop
@@ -124,8 +126,8 @@ expression: arit_exp                                                { $$ = Arith
 	;
 
 arit_exp: INTEGER_LITERAL                                           { $$ = IntegerArithmeticExpressionSemanticAction($1); }
-	| VAR_NAME                                                      { $$ = VarNameArithmeticExpressionSemanticAction($1); }
-	| function_call                                                 { $$ = FunctionCallArithmeticExpressionSemanticAction($1); }
+	| INT_VAR_NAME                                                  { $$ = VarNameArithmeticExpressionSemanticAction($1); }
+	| int_function_call                                             { $$ = FunctionCallArithmeticExpressionSemanticAction($1); }
 	| arit_exp ADD arit_exp                                     	{ $$ = AdditionExpressionSemanticAction($1, $3); }
 	| arit_exp SUB arit_exp                                         { $$ = SubtractionExpressionSemanticAction($1, $3); }
 	| arit_exp MUL arit_exp                                         { $$ = MultiplicationExpressionSemanticAction($1, $3); }
@@ -134,8 +136,8 @@ arit_exp: INTEGER_LITERAL                                           { $$ = Integ
 	;
 
 bool_exp: BOOL_LITERAL                                              { $$ = BoolLiteralExpressionSemanticAction($1); }
-	| VAR_NAME                                                      { $$ = VarNameBooleanExpressionSemanticAction($1); }
-	| function_call                                                 { $$ = FunctionCallBooleanExpressionSemanticAction($1); }
+	| BOOL_VAR_NAME                                                 { $$ = VarNameBooleanExpressionSemanticAction($1); }
+	| bool_function_call                                            { $$ = FunctionCallBooleanExpressionSemanticAction($1); }
 	| bool_exp AND bool_exp                                     	{ $$ = AndExpressionSemanticAction($1, $3); }
 	| bool_exp OR bool_exp                                          { $$ = OrExpressionSemanticAction($1, $3); }
 	| NOT bool_exp                                                  { $$ = NotExpressionSemanticAction($2); }
@@ -144,8 +146,8 @@ bool_exp: BOOL_LITERAL                                              { $$ = BoolL
 	;
 
 string_exp: STRING_LITERAL                                          { $$ = StringLiteralExpressionSemanticAction($1); }
-	| VAR_NAME                                                      { $$ = VarNameStringExpressionSemanticAction($1); }
-	| function_call                                                 { $$ = FunctionCallStringExpressionSemanticAction($1); }
+	| STRING_VAR_NAME                                               { $$ = VarNameStringExpressionSemanticAction($1); }
+	| string_function_call                                          { $$ = FunctionCallStringExpressionSemanticAction($1); }
 	;
 
 print: PRINT OPEN_PARENTHESIS expression CLOSE_PARENTHESIS          { $$ = PrintSemanticAction($3); }
@@ -162,8 +164,19 @@ parameters: parameter                                               { $$ = Singl
 parameter: type VAR_NAME                                            { $$ = ParameterSemanticAction($1, $2); }
 	;
 
-function_call: FUNCTION_NAME OPEN_PARENTHESIS arguments CLOSE_PARENTHESIS { $$ = FunctionCallSemanticAction($1, $3); }
-	| FUNCTION_NAME OPEN_PARENTHESIS CLOSE_PARENTHESIS					  { $$ = FunctionCallSemanticAction($1, NULL); }
+function_call: int_function_call | bool_function_call | string_function_call
+	;
+
+int_function_call: INT_FUNCTION_NAME OPEN_PARENTHESIS arguments CLOSE_PARENTHESIS { $$ = FunctionCallSemanticAction($1, $3, IntTypeSemanticAction()); }
+	| INT_FUNCTION_NAME OPEN_PARENTHESIS CLOSE_PARENTHESIS					    { $$ = FunctionCallSemanticAction($1, NULL, IntTypeSemanticAction()); }
+	;
+
+bool_function_call: BOOL_FUNCTION_NAME OPEN_PARENTHESIS arguments CLOSE_PARENTHESIS { $$ = FunctionCallSemanticAction($1, $3, BoolTypeSemanticAction()); }
+	| BOOL_FUNCTION_NAME OPEN_PARENTHESIS CLOSE_PARENTHESIS					      { $$ = FunctionCallSemanticAction($1, NULL, BoolTypeSemanticAction()); }
+	;
+
+string_function_call: STRING_FUNCTION_NAME OPEN_PARENTHESIS arguments CLOSE_PARENTHESIS { $$ = FunctionCallSemanticAction($1, $3, StringTypeSemanticAction()); }
+	| STRING_FUNCTION_NAME OPEN_PARENTHESIS CLOSE_PARENTHESIS					        { $$ = FunctionCallSemanticAction($1, NULL, StringTypeSemanticAction()); }
 	;
 
 arguments: argument                                                 { $$ = SingleArgumentSemanticAction($1); }

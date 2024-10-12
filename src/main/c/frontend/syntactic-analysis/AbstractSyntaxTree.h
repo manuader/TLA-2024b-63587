@@ -105,6 +105,7 @@ struct Print {
 struct FunctionCall {
     char * functionName;
     Arguments * arguments;
+    Type * returnType;
 };
 
 struct Function {

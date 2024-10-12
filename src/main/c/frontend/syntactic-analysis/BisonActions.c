@@ -139,7 +139,6 @@ Declaration * DeclarationSemanticAction(Type * type, Assignation * assignation) 
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Declaration * declaration = calloc(1, sizeof(Declaration));
     declaration->type = type;
-    declaration->varName = assignation->varName;
     declaration->assignation = assignation;
     return declaration;
 }
@@ -324,7 +323,7 @@ StringExpression * VarNameStringExpressionSemanticAction(char * varName) {
     stringExpression->varName = varName;
     return stringExpression;
 }
- 
+
 StringExpression * FunctionCallStringExpressionSemanticAction(FunctionCall * functionCall) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     StringExpression * stringExpression = calloc(1, sizeof(StringExpression));
@@ -381,11 +380,12 @@ Parameter * ParameterSemanticAction(Type * type, char * varName) {
     return parameter;
 }
 
-FunctionCall * FunctionCallSemanticAction(char * functionName, Arguments * arguments) {
+FunctionCall * FunctionCallSemanticAction(char * functionName, Arguments * arguments, Type * returnType) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     FunctionCall * functionCall = calloc(1, sizeof(FunctionCall));
     functionCall->functionName = functionName;
     functionCall->arguments = arguments;
+    functionCall->returnType = returnType;
     return functionCall;
 }
 

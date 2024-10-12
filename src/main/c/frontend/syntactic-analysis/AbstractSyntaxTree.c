@@ -118,6 +118,7 @@ void releaseFunctionCall(FunctionCall * functionCall) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (functionCall != NULL) {
 		free(functionCall->functionName);
+		free(functionCall->returnType);
 		releaseArguments(functionCall->arguments);
 		free(functionCall);
 	}
