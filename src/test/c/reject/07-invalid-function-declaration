@@ -1,0 +1,5 @@
+PROGRAM {
+    suma(INT a, INT b) {
+        RETURN a + b;
+    }
+}

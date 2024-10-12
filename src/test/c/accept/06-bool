@@ -1,0 +1,6 @@
+PROGRAM {
+    BOOL x = TRUE;
+    BOOL y = FALSE;
+    BOOL z = x AND NOT y;
+    PRINT(z);
+}

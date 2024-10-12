@@ -1,0 +1,6 @@
+PROGRAM {
+    INT a = 5;
+    INT b = 3;
+    INT c = a + b * 2 - 1;
+    PRINT(c);
+}

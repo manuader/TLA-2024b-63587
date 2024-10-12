@@ -1,0 +1,4 @@
+PROGRAM {
+    INT x = 5
+    PRINT(x);
+}

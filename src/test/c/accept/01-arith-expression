@@ -1,0 +1,4 @@
+PROGRAM {
+    INT x = 3 + 2;
+    PRINT(x);
+}

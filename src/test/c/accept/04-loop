@@ -1,0 +1,7 @@
+PROGRAM {
+    INT sum = 0;
+    FOR i IN (1, 5) {
+        sum = sum + i;
+    }
+    PRINT(sum);
+}   

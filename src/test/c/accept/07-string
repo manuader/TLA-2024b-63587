@@ -1,0 +1,6 @@
+PROGRAM {
+    STRING saludo = "Hola";
+    STRING nombre = "Mundo";
+    PRINT(saludo);
+    PRINT(nombre);
+}

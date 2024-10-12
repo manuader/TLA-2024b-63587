@@ -1,0 +1,9 @@
+PROGRAM {
+    INT a = 5;
+    INT b = 3;
+    IF (a > b) {
+        PRINT(a);
+    } ELSE {
+        PRINT(b);
+    }
+}
