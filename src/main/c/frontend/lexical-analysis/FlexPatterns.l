@@ -46,6 +46,8 @@
 "FOR"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), FOR); }
 "IN"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), IN); }
 "RETURN"							{ return KeywordLexemeAction(createLexicalAnalyzerContext(), RETURN); }
+"TRUE"								{ return BooleanLiteralLexemeAction(createLexicalAnalyzerContext(), true); }
+"FALSE"								{ return BooleanLiteralLexemeAction(createLexicalAnalyzerContext(), false); }
 
 "+"									{ return ArithmeticOperatorLexemeAction(createLexicalAnalyzerContext(), ADD); }
 "-"									{ return ArithmeticOperatorLexemeAction(createLexicalAnalyzerContext(), SUB); }
@@ -73,9 +75,9 @@
 \"									{ BEGIN(STRING); BeginStringLexemeAction(createLexicalAnalyzerContext()); }
 <STRING>[^\"\n\\]*					{ StringContentLexemeAction(createLexicalAnalyzerContext()); }
 <STRING>\\[\\\"nrt]				    { EscapedCharacterLexemeAction(createLexicalAnalyzerContext()); }
-<STRING>\"							{ return EndStringLexemeAction(createLexicalAnalyzerContext()); BEGIN(INITIAL); }
-<STRING>\n							{ return UnexpectedCharacterLexemeAction(createLexicalAnalyzerContext()); }
-<STRING>.							{ return UnexpectedCharacterLexemeAction(createLexicalAnalyzerContext()); }
+<STRING>\"							{ BEGIN(INITIAL); return EndStringLexemeAction(createLexicalAnalyzerContext()); }
+<STRING>\n							{ BEGIN(INITIAL); return UnexpectedCharacterLexemeAction(createLexicalAnalyzerContext()); }
+<STRING>.							{ StringContentLexemeAction(createLexicalAnalyzerContext()); }
 
 [[:space:]]+						{ IgnoredLexemeAction(createLexicalAnalyzerContext()); }
 

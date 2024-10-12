@@ -29,7 +29,7 @@ Token IntegerLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
 Token ParenthesisLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);
 Token UnknownLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
 Token KeywordLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);
-Token BooleanLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);
+Token BooleanLiteralLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, boolean value);
 Token ComparisonOperatorLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);
 Token BraceLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);
 Token PunctuationLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token);

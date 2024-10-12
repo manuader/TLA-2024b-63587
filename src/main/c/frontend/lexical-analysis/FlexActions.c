@@ -72,9 +72,20 @@ Token ParenthesisLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, T
 	return token;
 }
 
+Token UnknownLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
+    _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+    return YYUNDEF;
+}
+
 Token KeywordLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token) {
     _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
     return token;
+}
+
+Token BooleanLiteralLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, boolean value) {
+    _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+    lexicalAnalyzerContext->semanticValue->boolean = value;
+    return BOOL_LITERAL;
 }
 
 Token ComparisonOperatorLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token) {
@@ -105,19 +116,39 @@ Token IdentifierLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
 
 void BeginStringLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
     _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+    lexicalAnalyzerContext->semanticValue->string = strdup("");
 }
 
 void StringContentLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
     _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+    char* newContent = realloc(lexicalAnalyzerContext->semanticValue->string, 
+                                strlen(lexicalAnalyzerContext->semanticValue->string) + 
+                                strlen(lexicalAnalyzerContext->lexeme) + 1);
+    if (newContent) {
+        lexicalAnalyzerContext->semanticValue->string = newContent;
+        strcat(lexicalAnalyzerContext->semanticValue->string, lexicalAnalyzerContext->lexeme);
+    }
 }
 
 void EscapedCharacterLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
     _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+    char escapedChar;
+    switch(lexicalAnalyzerContext->lexeme[1]) {
+        case 'n': escapedChar = '\n'; break;
+        case 'r': escapedChar = '\r'; break;
+        case 't': escapedChar = '\t'; break;
+        default: escapedChar = lexicalAnalyzerContext->lexeme[1];
+    }
+    char* newContent = realloc(lexicalAnalyzerContext->semanticValue->string, 
+                                strlen(lexicalAnalyzerContext->semanticValue->string) + 2);
+    if (newContent) {
+        lexicalAnalyzerContext->semanticValue->string = newContent;
+        strncat(lexicalAnalyzerContext->semanticValue->string, &escapedChar, 1);
+    }
 }
 
 Token EndStringLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
     _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
-    lexicalAnalyzerContext->semanticValue->string = strdup(lexicalAnalyzerContext->lexeme);
     return STRING_LITERAL;
 }
 
@@ -125,4 +156,3 @@ Token UnexpectedCharacterLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerCo
     _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
     return YYUNDEF;
 }
-

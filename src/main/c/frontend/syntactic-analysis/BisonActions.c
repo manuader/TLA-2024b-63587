@@ -335,6 +335,7 @@ StringExpression * FunctionCallStringExpressionSemanticAction(FunctionCall * fun
 StringExpression * StringLiteralExpressionSemanticAction(char * value) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     StringExpression * stringExpression = calloc(1, sizeof(StringExpression));
+    stringExpression->type = STRING_LITERAL_T;
     stringExpression->value = value;
     return stringExpression;
 }
