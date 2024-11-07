@@ -75,4 +75,8 @@ CompareOperator * GreaterEqualsSemanticAction();
 CompareOperator * LessEqualsSemanticAction();
 ReturnStatement * ReturnStatementSemanticAction(Expression * expression);
 
+bool validateTypes(Type* expected, Type* actual, const char* context);
+Type* inferExpressionType(Expression* expr);
+void checkFunctionCallTypes(FunctionCall* call);
+
 #endif

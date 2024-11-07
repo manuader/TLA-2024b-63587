@@ -1,4 +1,5 @@
 #include "FlexActions.h"
+#include "../../shared/SymbolTable.h"
 
 /* MODULE INTERNAL STATE */
 
@@ -110,7 +111,38 @@ Token AssignmentLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
 
 Token IdentifierLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
     _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
-    lexicalAnalyzerContext->semanticValue->string = strdup(lexicalAnalyzerContext->lexeme);
+    
+    char* identifier = strdup(lexicalAnalyzerContext->lexeme);
+    lexicalAnalyzerContext->semanticValue->string = identifier;
+    
+    Symbol* symbol = findSymbol(identifier);
+    
+    if (symbol != NULL) {
+        if (symbol->kind == VARIABLE) {
+            switch (symbol->type->type) {
+                case INT_T:
+                    return INT_VAR_NAME;
+                case BOOL_T:
+                    return BOOL_VAR_NAME;
+                case STRING_T:
+                    return STRING_VAR_NAME;
+                default:
+                    return VAR_NAME;
+            }
+        } else if (symbol->kind == FUNCTION) {
+            switch (symbol->type->type) {
+                case INT_T:
+                    return INT_FUNCTION_NAME;
+                case BOOL_T:
+                    return BOOL_FUNCTION_NAME;
+                case STRING_T:
+                    return STRING_FUNCTION_NAME;
+                default:
+                    return FUNCTION_NAME;
+            }
+        }
+    }
+
     return VAR_NAME;
 }
 

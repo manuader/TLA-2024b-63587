@@ -279,3 +279,35 @@ void releaseReturnStatement(ReturnStatement * returnStatement) {
 		free(returnStatement);
 	}
 }
+
+Type* createType(enum DataType type) {
+	Type* newType = calloc(1, sizeof(Type));
+	newType->type = type;
+	return newType;
+}
+
+void destroyType(Type* type) {
+	if (type != NULL) {
+		free(type);
+	}
+}
+
+bool areTypesEqual(Type* type1, Type* type2) {
+	if (type1 == NULL || type2 == NULL) {
+		return false;
+	}
+	return type1->type == type2->type;
+}
+
+const char* typeToString(enum DataType type) {
+	switch (type) {
+		case INT_T:
+			return "INT";
+		case BOOL_T:
+			return "BOOL";
+		case STRING_T:
+			return "STRING";
+		default:
+			return "UNKNOWN";
+	}
+}

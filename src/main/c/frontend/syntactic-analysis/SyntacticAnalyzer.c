@@ -1,5 +1,6 @@
 #include "SyntacticAnalyzer.h"
 #include "../lexical-analysis/LexicalAnalyzerContext.h"
+#include "../../shared/SymbolTable.h"
 
 /* MODULE INTERNAL STATE */
 
@@ -48,8 +49,16 @@ CompilerState * currentCompilerState() {
 SyntacticAnalysisStatus parse(CompilerState * compilerState) {
 	logDebugging(_logger, "Parsing...");
 	_currentCompilerState = compilerState;
+	
+	// Inicializar tabla de símbolos
+	initializeSymbolTable();
+	
 	const int code = yyparse();
 	_currentCompilerState = NULL;
+	
+	// Liberar tabla de símbolos
+	shutdownSymbolTable();
+	
 	SyntacticAnalysisStatus syntacticAnalysisStatus;
 	logDebugging(_logger, "Parsing is done.");
 	switch (code) {

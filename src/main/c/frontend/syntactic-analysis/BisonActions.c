@@ -1,4 +1,6 @@
 #include "BisonActions.h"
+#include "../../shared/SymbolTable.h"
+#include "../syntactic-analysis/AbstractSyntaxTree.h"
 
 /* MODULE INTERNAL STATE */
 
@@ -137,8 +139,15 @@ Instruction * LoopInstructionSemanticAction(Loop * loop) {
 
 Declaration * DeclarationSemanticAction(Type * type, Assignation * assignation) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
+    
+    if (!addSymbol(assignation->varName, VARIABLE, type)) {
+        logError(_logger, "Error: Variable '%s' already declared", assignation->varName);
+        // Manejar el error según la política del compilador
+    }
+    
     Declaration * declaration = calloc(1, sizeof(Declaration));
     declaration->type = type;
+    declaration->varName = assignation->varName;
     declaration->assignation = assignation;
     return declaration;
 }
@@ -166,6 +175,33 @@ Type * StringTypeSemanticAction() {
 
 Assignation * AssignationSemanticAction(char * varName, Expression * expression) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
+    
+    Symbol* symbol = findSymbol(varName);
+    if (symbol == NULL) {
+        logError(_logger, "Error: Variable '%s' not declared", varName);
+        // Manejar el error
+    } else {
+        Type* varType = symbol->type;
+        bool typeError = false;
+        
+        switch (expression->type) {
+            case ARITHMETIC_EXPR_T:
+                if (varType->type != INT_T) typeError = true;
+                break;
+            case BOOLEAN_EXPR_T:
+                if (varType->type != BOOL_T) typeError = true;
+                break;
+            case STRING_EXPR_T:
+                if (varType->type != STRING_T) typeError = true;
+                break;
+        }
+        
+        if (typeError) {
+            logError(_logger, "Error: Type mismatch in assignment to '%s'", varName);
+            // Manejar el error
+        }
+    }
+    
     Assignation * assignation = calloc(1, sizeof(Assignation));
     assignation->varName = varName;
     assignation->expression = expression;
@@ -177,6 +213,7 @@ Expression * ArithmeticExpressionSemanticAction(ArithmeticExpression * arithmeti
     Expression * expression = calloc(1, sizeof(Expression));
     expression->type = ARITHMETIC_EXPR_T;
     expression->arithmeticExpression = arithmeticExpression;
+    expression->resultType = createType(INT_T);
     return expression;
 }
 
@@ -198,6 +235,23 @@ Expression * StringExpressionSemanticAction(StringExpression * stringExpression)
 
 ArithmeticExpression * AdditionExpressionSemanticAction(ArithmeticExpression * left, ArithmeticExpression * right) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
+    
+    if (left->type == VAR_ARITH_T) {
+        Type* leftType = getSymbolType(left->varName);
+        if (leftType->type != INT_T) {
+            logError(_logger, "Error: Left operand must be of type INT");
+            // Manejar el error
+        }
+    }
+    
+    if (right->type == VAR_ARITH_T) {
+        Type* rightType = getSymbolType(right->varName);
+        if (rightType->type != INT_T) {
+            logError(_logger, "Error: Right operand must be of type INT");
+            // Manejar el error
+        }
+    }
+    
     ArithmeticExpression * arithmeticExpression = calloc(1, sizeof(ArithmeticExpression));
     arithmeticExpression->type = ADD_T;
     arithmeticExpression->left = left;
@@ -274,6 +328,23 @@ BooleanExpression * FunctionCallBooleanExpressionSemanticAction(FunctionCall * f
 
 BooleanExpression * AndExpressionSemanticAction(BooleanExpression * left, BooleanExpression * right) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
+    
+    if (left->type == VAR_BOOL_T) {
+        Type* leftType = getSymbolType(left->varName);
+        if (leftType->type != BOOL_T) {
+            logError(_logger, "Error: Left operand must be of type BOOL");
+            // Manejar el error
+        }
+    }
+    
+    if (right->type == VAR_BOOL_T) {
+        Type* rightType = getSymbolType(right->varName);
+        if (rightType->type != BOOL_T) {
+            logError(_logger, "Error: Right operand must be of type BOOL");
+            // Manejar el error
+        }
+    }
+    
     BooleanExpression * booleanExpression = calloc(1, sizeof(BooleanExpression));
     booleanExpression->type = AND_T;
     booleanExpression->left = left;
@@ -349,6 +420,12 @@ Print * PrintSemanticAction(Expression * expression) {
 
 Function * FunctionSemanticAction(Type * returnType, char * functionName, Parameters * parameters, Block * block) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
+    
+    if (!addSymbol(functionName, FUNCTION, returnType)) {
+        logError(_logger, "Error: Function '%s' already declared", functionName);
+        // Manejar el error según la política del compilador
+    }
+    
     Function * function = calloc(1, sizeof(Function));
     function->returnType = returnType;
     function->functionName = functionName;
@@ -387,6 +464,9 @@ FunctionCall * FunctionCallSemanticAction(char * functionName, Arguments * argum
     functionCall->functionName = functionName;
     functionCall->arguments = arguments;
     functionCall->returnType = returnType;
+    
+    checkFunctionCallTypes(functionCall);
+    
     return functionCall;
 }
 
@@ -479,4 +559,60 @@ ReturnStatement * ReturnStatementSemanticAction(Expression * expression) {
     ReturnStatement * returnStatement = calloc(1, sizeof(ReturnStatement));
     returnStatement->expression = expression;
     return returnStatement;
+}
+
+bool validateTypes(Type* expected, Type* actual, const char* context) {
+    if (expected->type != actual->type) {
+        logError(_logger, "Type mismatch in %s: expected %d, got %d", 
+                context, expected->type, actual->type);
+        return false;
+    }
+    return true;
+}
+
+Type* inferExpressionType(Expression* expr) {
+    switch (expr->type) {
+        case ARITHMETIC_EXPR_T:
+            return createType(INT_T);
+        case BOOLEAN_EXPR_T:
+            return createType(BOOL_T);
+        case STRING_EXPR_T:
+            return createType(STRING_T);
+        default:
+            logError(_logger, "Unknown expression type");
+            return NULL;
+    }
+}
+
+void checkFunctionCallTypes(FunctionCall* call) {
+    Symbol* symbol = findSymbol(call->functionName);
+    if (!symbol) {
+        logError(_logger, "Function %s not declared", call->functionName);
+        return;
+    }
+
+    if (symbol->kind != FUNCTION) {
+        logError(_logger, "%s is not a function", call->functionName);
+        return;
+    }
+
+    // Validar tipo de retorno
+    call->returnType = symbol->type;
+
+    // Validar argumentos
+    Arguments* currentArg = call->arguments;
+    Parameters* currentParam = symbol->parameters;  // Necesitamos agregar esto a Symbol
+
+    while (currentArg && currentParam) {
+        Type* argType = inferExpressionType(currentArg->argument->expression);
+        if (!validateTypes(currentParam->parameter->type, argType, "function argument")) {
+            return;
+        }
+        currentArg = currentArg->next;
+        currentParam = currentParam->next;
+    }
+
+    if (currentArg || currentParam) {
+        logError(_logger, "Wrong number of arguments for function %s", call->functionName);
+    }
 }
