@@ -140,15 +140,12 @@ Instruction * LoopInstructionSemanticAction(Loop * loop) {
 Declaration * DeclarationSemanticAction(Type * type, Assignation * assignation) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     
-    if (!addSymbol(assignation->varName, VARIABLE, type)) {
-        logError(_logger, "Error: Variable '%s' already declared", assignation->varName);
-        // Manejar el error según la política del compilador
-    }
-    
     Declaration * declaration = calloc(1, sizeof(Declaration));
     declaration->type = type;
     declaration->varName = assignation->varName;
     declaration->assignation = assignation;
+
+    
     return declaration;
 }
 
@@ -420,17 +417,15 @@ Print * PrintSemanticAction(Expression * expression) {
 
 Function * FunctionSemanticAction(Type * returnType, char * functionName, Parameters * parameters, Block * block) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
-    
-    if (!addSymbol(functionName, FUNCTION, returnType)) {
-        logError(_logger, "Error: Function '%s' already declared", functionName);
-        // Manejar el error según la política del compilador
-    }
-    
+
     Function * function = calloc(1, sizeof(Function));
     function->returnType = returnType;
     function->functionName = functionName;
     function->parameters = parameters;
     function->block = block;
+
+    addFunctionSymbol(functionName, returnType, parameters);
+    
     return function;
 }
 
@@ -585,6 +580,13 @@ Type* inferExpressionType(Expression* expr) {
 }
 
 void checkFunctionCallTypes(FunctionCall* call) {
+    _logSyntacticAnalyzerAction(__FUNCTION__);
+
+    if (call == NULL) {
+        logError(_logger, "Invalid function call (NULL)");
+        return;
+    }
+
     Symbol* symbol = findSymbol(call->functionName);
     if (!symbol) {
         logError(_logger, "Function %s not declared", call->functionName);
@@ -597,17 +599,43 @@ void checkFunctionCallTypes(FunctionCall* call) {
     }
 
     // Validar tipo de retorno
-    call->returnType = symbol->type;
+    if (!validateTypes(call->returnType, symbol->type, "function return type")) {
+        return;
+    }
 
     // Validar argumentos
     Arguments* currentArg = call->arguments;
-    Parameters* currentParam = symbol->parameters;  // Necesitamos agregar esto a Symbol
+    Parameters* currentParam = symbol->parameters;
 
-    while (currentArg && currentParam) {
-        Type* argType = inferExpressionType(currentArg->argument->expression);
-        if (!validateTypes(currentParam->parameter->type, argType, "function argument")) {
+    logDebugging(_logger, "%s -- currentArg: %p, currentParam: %p", __FUNCTION__, currentArg, currentParam);
+
+    // Verificar que los punteros sean válidos antes de acceder
+    while (currentArg != NULL && currentParam != NULL) {
+        if (currentArg->argument == NULL || 
+            currentArg->argument->expression == NULL || 
+            currentArg->argument->expression->resultType == NULL) {
+            logError(_logger, "Invalid argument structure");
             return;
         }
+
+        if (currentParam->parameter == NULL || 
+            currentParam->parameter->type == NULL) {
+            logError(_logger, "Invalid parameter structure");
+            return;
+        }
+
+        // Ahora es seguro hacer el logging y la validación
+        logDebugging(_logger, "%s -- checking argument type: %d against parameter type: %d", 
+                    __FUNCTION__, 
+                    currentArg->argument->expression->resultType->type,
+                    currentParam->parameter->type->type);
+
+        if (!validateTypes(currentParam->parameter->type, 
+                         currentArg->argument->expression->resultType, 
+                         "function argument")) {
+            return;
+        }
+
         currentArg = currentArg->next;
         currentParam = currentParam->next;
     }

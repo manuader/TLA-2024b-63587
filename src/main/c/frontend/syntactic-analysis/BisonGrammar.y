@@ -47,7 +47,7 @@
 %token <token> PROGRAM INT BOOL STRING PRINT IF ELSE FOR IN RETURN
 %token <token> OPEN_PARENTHESIS CLOSE_PARENTHESIS SEMICOLON OPEN_BRACE CLOSE_BRACE COMMA EQUALS
 %token <token> GREATER_THAN LESS_THAN EQUALS_EQUALS NOT_EQUALS GREATER_EQUALS LESS_EQUALS
-%token <string> VAR_NAME FUNCTION_NAME STRING_LITERAL
+%token <string> FUNCTION_NAME STRING_LITERAL
 %token <string> INT_VAR_NAME BOOL_VAR_NAME STRING_VAR_NAME
 %token <string> INT_FUNCTION_NAME BOOL_FUNCTION_NAME STRING_FUNCTION_NAME
 %token <boolean> BOOL_LITERAL
@@ -108,7 +108,7 @@ instruction: declaration SEMICOLON                                  { $$ = Decla
 	| loop                                                          { $$ = LoopInstructionSemanticAction($1); }
 	;
 
-declaration: type assignation                             			{ $$ = DeclarationSemanticAction($1, $2); }
+declaration: type assignation                       				{ $$ = DeclarationSemanticAction($1, $2); }
 	;
 
 type: INT                                                           { $$ = IntTypeSemanticAction(); }
@@ -116,7 +116,9 @@ type: INT                                                           { $$ = IntTy
 	| STRING                                                        { $$ = StringTypeSemanticAction(); }
 	;
 
-assignation: VAR_NAME EQUALS expression                             { $$ = AssignationSemanticAction($1, $3); }
+assignation: INT_VAR_NAME EQUALS arit_exp                             { $$ = AssignationSemanticAction($1, ArithmeticExpressionSemanticAction($3)); }
+	| BOOL_VAR_NAME EQUALS bool_exp                                   { $$ = AssignationSemanticAction($1, BooleanExpressionSemanticAction($3)); }
+	| STRING_VAR_NAME EQUALS string_exp                               { $$ = AssignationSemanticAction($1, StringExpressionSemanticAction($3)); }
 	;
 	
 
@@ -161,7 +163,9 @@ parameters: parameter                                               { $$ = Singl
 	| parameter COMMA parameters                                    { $$ = MultipleParametersSemanticAction($1, $3); }
 	;
 
-parameter: type VAR_NAME                                            { $$ = ParameterSemanticAction($1, $2); }
+parameter: INT INT_VAR_NAME                                            { $$ = ParameterSemanticAction(IntTypeSemanticAction(), $2); }
+	| BOOL BOOL_VAR_NAME                                             { $$ = ParameterSemanticAction(BoolTypeSemanticAction(), $2); }
+	| STRING STRING_VAR_NAME                                           { $$ = ParameterSemanticAction(StringTypeSemanticAction(), $2); }
 	;
 
 function_call: int_function_call | bool_function_call | string_function_call
@@ -189,7 +193,7 @@ argument: expression                                                { $$ = Argum
 conditional: IF OPEN_PARENTHESIS bool_exp CLOSE_PARENTHESIS block ELSE block { $$ = ConditionalSemanticAction($3, $5, $7); }
 	;
 
-loop: FOR VAR_NAME IN OPEN_PARENTHESIS arit_exp COMMA arit_exp CLOSE_PARENTHESIS block { $$ = LoopSemanticAction($2, $5, $7, $9); }
+loop: FOR INT_VAR_NAME IN OPEN_PARENTHESIS arit_exp COMMA arit_exp CLOSE_PARENTHESIS block { $$ = LoopSemanticAction($2, $5, $7, $9); }
 	;
 
 compare_op: GREATER_THAN                                            { $$ = GreaterThanSemanticAction(); }

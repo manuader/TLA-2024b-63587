@@ -34,9 +34,9 @@
 <MULTILINE_COMMENT>.				{ IgnoredLexemeAction(createLexicalAnalyzerContext()); }
 
 "PROGRAM"							{ return KeywordLexemeAction(createLexicalAnalyzerContext(), PROGRAM); }
-"INT"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), INT); }
-"BOOL"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), BOOL); }
-"STRING"							{ return KeywordLexemeAction(createLexicalAnalyzerContext(), STRING); }
+"INT"								{ return TypeLexemeAction(createLexicalAnalyzerContext(), INT_T); }
+"BOOL"								{ return TypeLexemeAction(createLexicalAnalyzerContext(), BOOL_T); }
+"STRING"							{ return TypeLexemeAction(createLexicalAnalyzerContext(), STRING_T); }
 "AND"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), AND); }
 "OR"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), OR); }
 "NOT"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), NOT); }
@@ -69,7 +69,8 @@
 ","									{ return PunctuationLexemeAction(createLexicalAnalyzerContext(), COMMA); }
 "="									{ return AssignmentLexemeAction(createLexicalAnalyzerContext()); }
 
-[a-zA-Z_][a-zA-Z0-9_]*				{ return IdentifierLexemeAction(createLexicalAnalyzerContext()); }
+[a-zA-Z_][a-zA-Z0-9_]*				{ return VariableIdentifierLexemeAction(createLexicalAnalyzerContext()); }
+[a-zA-Z_][a-zA-Z0-9_]*/"("			{ return FunctionIdentifierLexemeAction(createLexicalAnalyzerContext()); }
 [0-9]+								{ return IntegerLexemeAction(createLexicalAnalyzerContext()); }
 
 \"									{ BEGIN(STRING); BeginStringLexemeAction(createLexicalAnalyzerContext()); }

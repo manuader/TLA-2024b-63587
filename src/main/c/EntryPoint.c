@@ -39,7 +39,7 @@
 	if (syntacticAnalysisStatus == ACCEPT) {
 		// ----------------------------------------------------------------------------------------
 		// Beginning of the Backend... ------------------------------------------------------------
-		// logDebugging(logger, "Computing expression value...");
+		logDebugging(logger, "SOS UN GENIO MANU!!!!");
 		// Program * program = compilerState.abstractSyntaxtTree;
 		// ComputationResult computationResult = computeExpression(program->expression);
 		// if (computationResult.succeed) {
@@ -69,5 +69,5 @@
 	shutdownFlexActionsModule();
 	logDebugging(logger, "Compilation is done.");
 	destroyLogger(logger);
-	return 0;
+	return compilationStatus;
 }

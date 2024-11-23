@@ -5,16 +5,19 @@
 
 static Logger * _logger = NULL;
 static boolean _logIgnoredLexemes = true;
+Type* _type = NULL;
 
 void initializeFlexActionsModule() {
 	_logIgnoredLexemes = getBooleanOrDefault("LOG_IGNORED_LEXEMES", _logIgnoredLexemes);
 	_logger = createLogger("FlexActions");
+	_type = NULL;
 }
  
 void shutdownFlexActionsModule() {
 	if (_logger != NULL) {
 		destroyLogger(_logger);
 	}
+	destroyType(_type);
 }
 
 /* PRIVATE FUNCTIONS */
@@ -109,41 +112,92 @@ Token AssignmentLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
     return EQUALS;
 }
 
-Token IdentifierLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
+Token TypeLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token) {
+    _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+    if (_type != NULL) {
+        destroyType(_type);
+    }
+    logDebugging(_logger, "%s -- TIPO DE VARIABLE: %d ", __FUNCTION__, token);
+    _type = createType(token);
+    switch (token) {
+        case INT_T:
+            return INT;
+        case BOOL_T:
+            return BOOL;
+        case STRING_T:
+            return STRING;
+        default:
+            return YYUNDEF;
+    }
+}
+
+Token VariableIdentifierLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
     _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
     
     char* identifier = strdup(lexicalAnalyzerContext->lexeme);
     lexicalAnalyzerContext->semanticValue->string = identifier;
+    Type* identifierType = NULL;
     
     Symbol* symbol = findSymbol(identifier);
     
-    if (symbol != NULL) {
-        if (symbol->kind == VARIABLE) {
-            switch (symbol->type->type) {
-                case INT_T:
-                    return INT_VAR_NAME;
-                case BOOL_T:
-                    return BOOL_VAR_NAME;
-                case STRING_T:
-                    return STRING_VAR_NAME;
-                default:
-                    return VAR_NAME;
-            }
-        } else if (symbol->kind == FUNCTION) {
-            switch (symbol->type->type) {
-                case INT_T:
-                    return INT_FUNCTION_NAME;
-                case BOOL_T:
-                    return BOOL_FUNCTION_NAME;
-                case STRING_T:
-                    return STRING_FUNCTION_NAME;
-                default:
-                    return FUNCTION_NAME;
-            }
+    if (symbol != NULL) {   
+        // If the identifier already exists in the symbol table use its type
+        logDebugging(_logger, "%s -- IDENTIFIER ENCONTRADO: %s", __FUNCTION__, identifier);
+        if (symbol->kind == VARIABLE) identifierType = symbol->type;
+
+    } else {
+        // If the identifier does not exist in the symbol table, a new symbol is created
+        logDebugging(_logger, "%s -- IDENTIFIER NO ENCONTRADO: %s", __FUNCTION__, identifier);
+        logDebugging(_logger, "%s -- TIPO DE VARIABLE: %d", __FUNCTION__, _type == NULL ? -1 : _type->type);
+        if (_type != NULL) {
+            identifierType = createType(_type->type);
+            addSymbol(identifier, VARIABLE, identifierType);
         }
     }
 
-    return VAR_NAME;
+    if (identifierType != NULL) {
+        switch (identifierType->type) {
+            case INT_T:
+                logDebugging(_logger, "%s -- TOKEN ENVIADO: INT_VAR_NAME", __FUNCTION__);
+                return INT_VAR_NAME;
+            case BOOL_T:
+                logDebugging(_logger, "%s -- TOKEN ENVIADO: BOOL_VAR_NAME", __FUNCTION__);
+                return BOOL_VAR_NAME;
+            case STRING_T:
+                logDebugging(_logger, "TOKEN ENVIADO: STRING_VAR_NAME");
+                return STRING_VAR_NAME;
+        }
+    }
+
+    return YYUNDEF;                           
+}
+
+Token FunctionIdentifierLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
+    _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+
+    char* identifier = strdup(lexicalAnalyzerContext->lexeme);
+    lexicalAnalyzerContext->semanticValue->string = identifier;
+    Type* identifierType = _type;
+    
+    Symbol* symbol = findSymbol(identifier);
+    
+    if (symbol != NULL) {   
+        // If the identifier already exists in the symbol table use its type
+        if (symbol->kind == FUNCTION) identifierType = symbol->type;
+
+    } else {
+        // If the identifier does not exist in the symbol table, a new symbol is created
+        return FUNCTION_NAME;
+    }
+
+    switch (identifierType->type) {
+        case INT_T:
+            return INT_FUNCTION_NAME;
+        case BOOL_T:
+            return BOOL_FUNCTION_NAME;
+        case STRING_T:
+            return STRING_FUNCTION_NAME;
+    }    
 }
 
 void BeginStringLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {

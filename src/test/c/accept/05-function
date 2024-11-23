@@ -3,5 +3,5 @@ PROGRAM {
         RETURN a + b;
     }
     INT resultado = suma(3, 4);
-    PRINT(resultado);
+    RETURN resultado;
 }
