@@ -40,10 +40,10 @@
 "AND"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), AND); }
 "OR"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), OR); }
 "NOT"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), NOT); }
-"PRINT"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), PRINT); }
-"IF"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), IF); }
-"ELSE"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), ELSE); }
-"FOR"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), FOR); }
+"PRINT"/[[:space:]]*"("				{ return KeywordLexemeAction(createLexicalAnalyzerContext(), PRINT); }
+"IF"/[[:space:]]*"("				{ return KeywordLexemeAction(createLexicalAnalyzerContext(), IF); }
+"ELSE"							    { return KeywordLexemeAction(createLexicalAnalyzerContext(), ELSE); }
+"FOR"       						{ return KeywordLexemeAction(createLexicalAnalyzerContext(), FOR); }
 "IN"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), IN); }
 "RETURN"							{ return KeywordLexemeAction(createLexicalAnalyzerContext(), RETURN); }
 "TRUE"								{ return BooleanLiteralLexemeAction(createLexicalAnalyzerContext(), true); }

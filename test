@@ -1,7 +1,9 @@
 PROGRAM {
-    INT suma(INT a, INT b) {
-        RETURN a + b;
+    INT a = 5;
+    INT b = 3;
+    IF (a > b) {
+        PRINT(a);
+    } ELSE {
+        PRINT(b);
     }
-    INT resultado = suma(3, 4);
-    PRINT(resultado);
 }
