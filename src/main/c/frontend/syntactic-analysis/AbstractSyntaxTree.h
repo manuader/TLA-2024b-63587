@@ -142,7 +142,6 @@ struct ArithmeticExpression {
         FunctionCall * functionCall;
     };
     enum ArithmeticExpressionType { ADD_T, SUB_T, MUL_T, DIV_T, VAR_ARITH_T, INT_LITERAL_T, FUNC_CALL_ARITH_T } type;
-    Type * resultType;
 };
 
 struct BooleanExpression {
@@ -162,7 +161,6 @@ struct BooleanExpression {
         FunctionCall * functionCall;
     };
     enum BooleanExpressionType { AND_T, OR_T, NOT_T, COMPARISON_T, VAR_BOOL_T, BOOL_LITERAL_T, FUNC_CALL_BOOL_T } type;
-    Type * resultType;
 };
 
 struct StringExpression {
@@ -172,7 +170,6 @@ struct StringExpression {
         FunctionCall * functionCall;
     };
     enum StringExpressionType { STRING_LITERAL_T, VAR_STRING_T, FUNC_CALL_STRING_T } type;
-    Type * resultType;
 };
 
 struct CompareOperator {

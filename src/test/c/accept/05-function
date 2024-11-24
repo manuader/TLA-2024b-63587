@@ -2,6 +2,6 @@ PROGRAM {
     INT suma(INT a, INT b) {
         RETURN a + b;
     }
-    INT resultado = suma(3, 4);
-    RETURN resultado;
+
+    RETURN suma(3, 4);
 }

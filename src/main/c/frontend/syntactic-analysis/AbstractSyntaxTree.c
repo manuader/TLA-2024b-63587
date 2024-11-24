@@ -73,7 +73,6 @@ void releaseDeclaration(Declaration * declaration) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (declaration != NULL) {
 		free(declaration->type);
-		free(declaration->varName);
 		releaseAssignation(declaration->assignation);
 		free(declaration);
 	}
@@ -91,6 +90,9 @@ void releaseAssignation(Assignation * assignation) {
 void releaseExpression(Expression * expression) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (expression != NULL) {
+		if (expression->resultType != NULL) {
+			free(expression->resultType);
+		}
 		switch (expression->type) {
 			case ARITHMETIC_EXPR_T:
 				releaseArithmeticExpression(expression->arithmeticExpression);

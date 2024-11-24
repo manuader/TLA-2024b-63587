@@ -219,6 +219,7 @@ Expression * BooleanExpressionSemanticAction(BooleanExpression * booleanExpressi
     Expression * expression = calloc(1, sizeof(Expression));
     expression->type = BOOLEAN_EXPR_T;
     expression->booleanExpression = booleanExpression;
+    expression->resultType = createType(BOOL_T);
     return expression;
 }
 
@@ -227,6 +228,7 @@ Expression * StringExpressionSemanticAction(StringExpression * stringExpression)
     Expression * expression = calloc(1, sizeof(Expression));
     expression->type = STRING_EXPR_T;
     expression->stringExpression = stringExpression;
+    expression->resultType = createType(STRING_T);
     return expression;
 }
 

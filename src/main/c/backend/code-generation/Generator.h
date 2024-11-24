@@ -1,22 +1,33 @@
-// #ifndef GENERATOR_HEADER
-// #define GENERATOR_HEADER
+#ifndef GENERATOR_HEADER
+#define GENERATOR_HEADER
 
-// #include "../../frontend/syntactic-analysis/AbstractSyntaxTree.h"
-// #include "../../shared/CompilerState.h"
-// #include "../../shared/Logger.h"
-// #include "../../shared/String.h"
-// #include <stdarg.h>
-// #include <stdio.h>
+#include "../../shared/CompilerState.h"
+#include "../../shared/Logger.h"
+#include "../../frontend/syntactic-analysis/AbstractSyntaxTree.h"
 
-// /** Initialize module's internal state. */
-// void initializeGeneratorModule();
+void initializeGeneratorModule();
+void shutdownGeneratorModule();
+void generate(CompilerState * compilerState);
 
-// /** Shutdown module's internal state. */
-// void shutdownGeneratorModule();
+// Nuevas funciones para generación de código
+static void generateProgram(Program * program);
+static void generateBlock(Block * block);
+static void generateInstruction(Instruction * instruction);
+static void generateDeclaration(Declaration * declaration);
+static void generateAssignation(Assignation * assignation);
+static void generatePrint(Print * print);
+static void generateFunction(Function * function);
+static void generateFunctionCall(FunctionCall * functionCall);
+static void generateConditional(Conditional * conditional);
+static void generateLoop(Loop * loop);
+static void generateExpression(Expression * expression);
+static void generateArithmeticExpression(ArithmeticExpression * expression);
+static void generateBooleanExpression(BooleanExpression * expression);
+static void generateStringExpression(StringExpression * expression);
+static void generateReturnStatement(ReturnStatement * returnStatement);
+static void generateParameters(Parameters * parameters);
+static void generateArguments(Arguments * arguments);
+static const char * getTypeString(Type * type);
+static void generateCompareOperator(CompareOperator * op);
 
-// /**
-//  * Generates the final output using the current compiler state.
-//  */
-// void generate(CompilerState * compilerState);
-
-// #endif
+#endif

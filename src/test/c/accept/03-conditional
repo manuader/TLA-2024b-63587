@@ -6,4 +6,5 @@ PROGRAM {
     } ELSE {
         PRINT(b);
     }
+    RETURN 0;
 }

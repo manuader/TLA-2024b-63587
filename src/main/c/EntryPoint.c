@@ -21,7 +21,7 @@
 	initializeSyntacticAnalyzerModule();
 	initializeAbstractSyntaxTreeModule();
 	// initializeCalculatorModule();
-	// initializeGeneratorModule();
+	initializeGeneratorModule();
 
 	// Logs the arguments of the application.
 	for (int k = 0; k < count; ++k) {
@@ -39,21 +39,12 @@
 	if (syntacticAnalysisStatus == ACCEPT) {
 		// ----------------------------------------------------------------------------------------
 		// Beginning of the Backend... ------------------------------------------------------------
-		logDebugging(logger, "SOS UN GENIO MANU!!!!");
-		// Program * program = compilerState.abstractSyntaxtTree;
-		// ComputationResult computationResult = computeExpression(program->expression);
-		// if (computationResult.succeed) {
-		// 	compilerState.value = computationResult.value;
-		// 	generate(&compilerState);
-		// }
-		// else {
-		// 	logError(logger, "The computation phase rejects the input program.");
-		// 	compilationStatus = FAILED;
-		// }
+		Program * program = compilerState.abstractSyntaxtTree;
+		generate(&compilerState);
 		// ...end of the Backend. -----------------------------------------------------------------
 		// ----------------------------------------------------------------------------------------
-		// logDebugging(logger, "Releasing AST resources...");
-		// releaseProgram(program);
+		logDebugging(logger, "Releasing AST resources...");
+		releaseProgram(program);
 	}
 	else {
 		logError(logger, "The syntactic-analysis phase rejects the input program.");
@@ -61,7 +52,7 @@
 	}
 
 	logDebugging(logger, "Releasing modules resources...");
-	// shutdownGeneratorModule();
+	shutdownGeneratorModule();
 	// shutdownCalculatorModule();
 	shutdownAbstractSyntaxTreeModule();
 	shutdownSyntacticAnalyzerModule();

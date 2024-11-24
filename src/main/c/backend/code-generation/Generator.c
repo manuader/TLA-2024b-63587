@@ -1,174 +1,331 @@
-// #include "Generator.h"
+#include "Generator.h"
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-// /* MODULE INTERNAL STATE */
+/* MODULE INTERNAL STATE */
+const char _indentationCharacter = ' ';
+const char _indentationSize = 4;
+static Logger * _logger = NULL;
 
-// const char _indentationCharacter = ' ';
-// const char _indentationSize = 4;
-// static Logger * _logger = NULL;
+void initializeGeneratorModule() {
+	_logger = createLogger("Generator");
+}
 
-// void initializeGeneratorModule() {
-// 	_logger = createLogger("Generator");
-// }
+void shutdownGeneratorModule() {
+	if (_logger != NULL) {
+		destroyLogger(_logger);
+	}
+}
 
-// void shutdownGeneratorModule() {
-// 	if (_logger != NULL) {
-// 		destroyLogger(_logger);
-// 	}
-// }
+/** PRIVATE FUNCTIONS */
 
-// /** PRIVATE FUNCTIONS */
+static char * _indentation(const unsigned int level) {
+	return indentation(_indentationCharacter, level, _indentationSize);
+}
 
-// static const char _expressionTypeToCharacter(const ExpressionType type);
-// static void _generateConstant(const unsigned int indentationLevel, Constant * constant);
-// static void _generateEpilogue(const int value);
-// static void _generateExpression(const unsigned int indentationLevel, Expression * expression);
-// static void _generateFactor(const unsigned int indentationLevel, Factor * factor);
-// static void _generateProgram(Program * program);
-// static void _generatePrologue(void);
-// static char * _indentation(const unsigned int indentationLevel);
-// static void _output(const unsigned int indentationLevel, const char * const format, ...);
+static void _output(const unsigned int indentationLevel, const char * const format, ...) {
+	va_list arguments;
+	va_start(arguments, format);
+	char * indentation = _indentation(indentationLevel);
+	char * effectiveFormat = concatenate(2, indentation, format);
+	vfprintf(stdout, effectiveFormat, arguments);
+	fflush(stdout);
+	free(effectiveFormat);
+	free(indentation);
+	va_end(arguments);
+}
 
-// /**
-//  * Converts and expression type to the proper character of the operation
-//  * involved, or returns '\0' if that's not possible.
-//  */
-// static const char _expressionTypeToCharacter(const ExpressionType type) {
-// 	switch (type) {
-// 		case ADDITION: return '+';
-// 		case DIVISION: return '/';
-// 		case MULTIPLICATION: return '*';
-// 		case SUBTRACTION: return '-';
-// 		default:
-// 			logError(_logger, "The specified expression type cannot be converted into character: %d", type);
-// 			return '\0';
-// 	}
-// }
+static void generateProgram(Program * program) {
+	// Generar el bloque principal dentro de main()
+	_output(0, "int main() {\n");
+	generateBlock(program->block);
+	_output(0, "}\n");
+}
 
-// /**
-//  * Generates the output of a constant.
-//  */
-// static void _generateConstant(const unsigned int indentationLevel, Constant * constant) {
-// 	_output(indentationLevel, "%s", "[ $C$, circle, draw, black!20\n");
-// 	_output(1 + indentationLevel, "%s%d%s", "[ $", constant->value, "$, circle, draw ]\n");
-// 	_output(indentationLevel, "%s", "]\n");
-// }
+static void generateBlock(Block * block) {
+	Instruction * current = block->instructions;
+	while (current != NULL) {
+		generateInstruction(current);
+		current = current->next;
+	}
+}
 
-// /**
-//  * Creates the epilogue of the generated output, that is, the final lines that
-//  * completes a valid Latex document.
-//  */
-// static void _generateEpilogue(const int value) {
-// 	_output(0, "%s%d%s",
-// 		"            [ $", value, "$, circle, draw, blue ]\n"
-// 		"        ]\n"
-// 		"    \\end{forest}\n"
-// 		"\\end{document}\n\n"
-// 	);
-// }
+static void generateInstruction(Instruction * instruction) {
+	switch (instruction->type) {
+		case DECLARATION_INSTRUCTION_T:
+			generateDeclaration(instruction->declaration);
+			break;
+		case ASSIGNATION_INSTRUCTION_T:
+			generateAssignation(instruction->assignation);
+			break;
+		case PRINT_INSTRUCTION_T:
+			generatePrint(instruction->print);
+			break;
+		case FUNCTION_INSTRUCTION_T:
+			generateFunction(instruction->function);
+			break;
+		case CONDITIONAL_INSTRUCTION_T:
+			generateConditional(instruction->conditional);
+			break;
+		case LOOP_INSTRUCTION_T:
+			generateLoop(instruction->loop);
+			break;
+		case RETURN_STATEMENT_INSTRUCTION_T:
+			generateReturnStatement(instruction->returnStatement);
+			break;
+		case EXPRESSION_INSTRUCTION_T:
+			generateExpression(instruction->expression);
+			_output(0, ";\n");
+			break;
+		case FUNCTION_CALL_INSTRUCTION_T:
+			generateFunctionCall(instruction->functionCall);
+			_output(0, ";\n");
+			break;
+	}
+}
 
-// /**
-//  * Generates the output of an expression.
-//  */
-// static void _generateExpression(const unsigned int indentationLevel, Expression * expression) {
-// 	_output(indentationLevel, "%s", "[ $E$, circle, draw, black!20\n");
-// 	switch (expression->type) {
-// 		case ADDITION:
-// 		case DIVISION:
-// 		case MULTIPLICATION:
-// 		case SUBTRACTION:
-// 			_generateExpression(1 + indentationLevel, expression->leftExpression);
-// 			_output(1 + indentationLevel, "%s%c%s", "[ $", _expressionTypeToCharacter(expression->type), "$, circle, draw, purple ]\n");
-// 			_generateExpression(1 + indentationLevel, expression->rightExpression);
-// 			break;
-// 		case FACTOR:
-// 			_generateFactor(1 + indentationLevel, expression->factor);
-// 			break;
-// 		default:
-// 			logError(_logger, "The specified expression type is unknown: %d", expression->type);
-// 			break;
-// 	}
-// 	_output(indentationLevel, "%s", "]\n");
-// }
+static void generateDeclaration(Declaration * declaration) {
+	_output(1, "%s %s", typeToString(declaration->type->type), declaration->varName);
+	if (declaration->assignation != NULL) {
+		_output(0, " = ");
+		generateExpression(declaration->assignation->expression);
+	}
+	_output(0, ";\n");
+}
 
-// /**
-//  * Generates the output of a factor.
-//  */
-// static void _generateFactor(const unsigned int indentationLevel, Factor * factor) {
-// 	_output(indentationLevel, "%s", "[ $F$, circle, draw, black!20\n");
-// 	switch (factor->type) {
-// 		case CONSTANT:
-// 			_generateConstant(1 + indentationLevel, factor->constant);
-// 			break;
-// 		case EXPRESSION:
-// 			_output(1 + indentationLevel, "%s", "[ $($, circle, draw, purple ]\n");
-// 			_generateExpression(1 + indentationLevel, factor->expression);
-// 			_output(1 + indentationLevel, "%s", "[ $)$, circle, draw, purple ]\n");
-// 			break;
-// 		default:
-// 			logError(_logger, "The specified factor type is unknown: %d", factor->type);
-// 			break;
-// 	}
-// 	_output(indentationLevel, "%s", "]\n");
-// }
+static void generateAssignation(Assignation * assignation) {
+	_output(1, "%s = ", assignation->varName);
+	generateExpression(assignation->expression);
+	_output(0, ";\n");
+}
 
-// /**
-//  * Generates the output of the program.
-//  */
-// static void _generateProgram(Program * program) {
-// 	_generateExpression(3, program->expression);
-// }
+static void generatePrint(Print * print) {
+	_output(1, "printf(\"");
+	
+	switch(print->expression->type) {
+		case ARITHMETIC_EXPR_T:
+			_output(0, "%%d\\n\", ");
+			break;
+		case BOOLEAN_EXPR_T:
+			_output(0, "%%s\\n\", ");
+			break;
+		case STRING_EXPR_T:
+			_output(0, "%%s\\n\", ");
+			break;
+	}
+	
+	generateExpression(print->expression);
+	_output(0, ");\n");
+}
 
-// /**
-//  * Creates the prologue of the generated output, a Latex document that renders
-//  * a tree thanks to the Forest package.
-//  *
-//  * @see https://ctan.dcc.uchile.cl/graphics/pgf/contrib/forest/forest-doc.pdf
-//  */
-// static void _generatePrologue(void) {
-// 	_output(0, "%s",
-// 		"\\documentclass{standalone}\n\n"
-// 		"\\usepackage[utf8]{inputenc}\n"
-// 		"\\usepackage[T1]{fontenc}\n"
-// 		"\\usepackage{amsmath}\n"
-// 		"\\usepackage{forest}\n"
-// 		"\\usepackage{microtype}\n\n"
-// 		"\\begin{document}\n"
-// 		"    \\centering\n"
-// 		"    \\begin{forest}\n"
-// 		"        [ \\text{$=$}, circle, draw, purple\n"
-// 	);
-// }
+static void generateExpression(Expression * expression) {
+	switch(expression->type) {
+		case ARITHMETIC_EXPR_T:
+			generateArithmeticExpression(expression->arithmeticExpression);
+			break;
+		case BOOLEAN_EXPR_T:
+			generateBooleanExpression(expression->booleanExpression);
+			break;
+		case STRING_EXPR_T:
+			generateStringExpression(expression->stringExpression);
+			break;
+	}
+}
 
-// /**
-//  * Generates an indentation string for the specified level.
-//  */
-// static char * _indentation(const unsigned int level) {
-// 	return indentation(_indentationCharacter, level, _indentationSize);
-// }
+static void generateArithmeticExpression(ArithmeticExpression * expression) {
+	switch(expression->type) {
+		case ADD_T:
+			generateArithmeticExpression(expression->left);
+			_output(0, " + ");
+			generateArithmeticExpression(expression->right);
+			break;
+		case SUB_T:
+			generateArithmeticExpression(expression->left);
+			_output(0, " - ");
+			generateArithmeticExpression(expression->right);
+			break;
+		case MUL_T:
+			generateArithmeticExpression(expression->left);
+			_output(0, " * ");
+			generateArithmeticExpression(expression->right);
+			break;
+		case DIV_T:
+			generateArithmeticExpression(expression->left);
+			_output(0, " / ");
+			generateArithmeticExpression(expression->right);
+			break;
+		case INT_LITERAL_T:
+			_output(0, "%d", expression->value);
+			break;
+		case VAR_ARITH_T:
+			_output(0, "%s", expression->varName);
+			break;
+		case FUNC_CALL_ARITH_T:
+			generateFunctionCall(expression->functionCall);
+			break;
+	}
+}
 
-// /**
-//  * Outputs a formatted string to standard output. The "fflush" instruction
-//  * allows to see the output even close to a failure, because it drops the
-//  * buffering.
-//  */
-// static void _output(const unsigned int indentationLevel, const char * const format, ...) {
-// 	va_list arguments;
-// 	va_start(arguments, format);
-// 	char * indentation = _indentation(indentationLevel);
-// 	char * effectiveFormat = concatenate(2, indentation, format);
-// 	vfprintf(stdout, effectiveFormat, arguments);
-// 	fflush(stdout);
-// 	free(effectiveFormat);
-// 	free(indentation);
-// 	va_end(arguments);
-// }
+static void generateBooleanExpression(BooleanExpression * expression) {
+	switch(expression->type) {
+		case AND_T:
+			generateBooleanExpression(expression->left);
+			_output(0, " && ");
+			generateBooleanExpression(expression->right);
+			break;
+		case OR_T:
+			generateBooleanExpression(expression->left);
+			_output(0, " || ");
+			generateBooleanExpression(expression->right);
+			break;
+		case NOT_T:
+			_output(0, "!");
+			generateBooleanExpression(expression->notExpr);
+			break;
+		case COMPARISON_T:
+			generateArithmeticExpression(expression->leftArith);
+			generateCompareOperator(expression->op);
+			generateArithmeticExpression(expression->rightArith);
+			break;
+		case BOOL_LITERAL_T:
+			_output(0, "%s", expression->value ? "true" : "false");
+			break;
+		case VAR_BOOL_T:
+			_output(0, "%s", expression->varName);
+			break;
+		case FUNC_CALL_BOOL_T:
+			generateFunctionCall(expression->functionCall);
+			break;
+	}
+}
 
-// /** PUBLIC FUNCTIONS */
+static void generateStringExpression(StringExpression * expression) {
+	switch(expression->type) {
+		case STRING_LITERAL_T:
+			_output(0, "\"%s\"", expression->value);
+			break;
+		case VAR_STRING_T:
+			_output(0, "%s", expression->varName);
+			break;
+		case FUNC_CALL_STRING_T:
+			generateFunctionCall(expression->functionCall);
+			break;
+	}
+}
 
-// void generate(CompilerState * compilerState) {
-// 	logDebugging(_logger, "Generating final output...");
-// 	_generatePrologue();
-// 	_generateProgram(compilerState->abstractSyntaxtTree);
-// 	_generateEpilogue(compilerState->value);
-// 	logDebugging(_logger, "Generation is done.");
-// }
+static void generateFunction(Function * function) {
+	_output(0, "%s %s(", typeToString(function->returnType->type), function->functionName);
+	generateParameters(function->parameters);
+	_output(0, ") {\n");
+	
+	generateBlock(function->block);
+	
+	_output(0, "}\n\n");
+}
+
+static void generateFunctionCall(FunctionCall * call) {
+	_output(0, "%s(", call->functionName);
+	if (call->arguments != NULL) {
+		generateArguments(call->arguments);
+	}
+	_output(0, ")");
+}
+
+static void generateConditional(Conditional * conditional) {
+	_output(1, "if (");
+	generateBooleanExpression(conditional->condition);
+	_output(0, ") {\n");
+	
+	generateBlock(conditional->ifBlock);
+	
+	if (conditional->elseBlock != NULL) {
+		_output(1, "} else {\n");
+		generateBlock(conditional->elseBlock);
+	}
+	
+	_output(1, "}\n");
+}
+
+static void generateLoop(Loop * loop) {
+	_output(1, "for (int %s = ", loop->varName);
+	generateArithmeticExpression(loop->start);
+	_output(0, "; %s <= ", loop->varName);
+	generateArithmeticExpression(loop->end);
+	_output(0, "; %s++) {\n", loop->varName);
+	
+	generateBlock(loop->block);
+	
+	_output(1, "}\n");
+}
+
+static void generateParameters(Parameters * parameters) {
+	if (parameters == NULL) return;
+	
+	Parameter * current = parameters->parameter;
+	_output(0, "%s %s", typeToString(current->type->type), current->varName);
+	
+	Parameters * next = parameters->next;
+	while (next != NULL) {
+		_output(0, ", %s %s", typeToString(next->parameter->type->type), next->parameter->varName);
+		next = next->next;
+	}
+}
+
+static void generateArguments(Arguments * arguments) {
+	if (arguments == NULL) return;
+	
+	generateExpression(arguments->argument->expression);
+	
+	Arguments * current = arguments->next;
+	while (current != NULL) {
+		_output(0, ", ");
+		generateExpression(current->argument->expression);
+		current = current->next;
+	}
+}
+
+static void generateCompareOperator(CompareOperator * op) {
+	switch(op->type) {
+		case GREATER_THAN_T:
+			_output(0, " > ");
+			break;
+		case LESS_THAN_T:
+			_output(0, " < ");
+			break;
+		case EQUALS_EQUALS_T:
+			_output(0, " == ");
+			break;
+		case NOT_EQUALS_T:
+			_output(0, " != ");
+			break;
+		case GREATER_EQUALS_T:
+			_output(0, " >= ");
+			break;
+		case LESS_EQUALS_T:
+			_output(0, " <= ");
+			break;
+	}
+}
+
+static void generateReturnStatement(ReturnStatement * returnStatement) {
+	_output(1, "return ");
+	generateExpression(returnStatement->expression);
+	_output(0, ";\n");
+}
+
+void generate(CompilerState * compilerState) {
+	logDebugging(_logger, "Generating C code...\n");
+	
+	// Generar includes y setup inicial
+	_output(0, "%s",
+		"#include <stdio.h>\n"
+		"#include <stdbool.h>\n"
+		"#include <string.h>\n\n"
+	);
+	
+	// Generar el programa
+	generateProgram(compilerState->abstractSyntaxtTree);
+	
+	logDebugging(_logger, "Code generation completed.");
+}
