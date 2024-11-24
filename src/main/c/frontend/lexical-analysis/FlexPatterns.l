@@ -40,8 +40,8 @@
 "AND"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), AND); }
 "OR"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), OR); }
 "NOT"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), NOT); }
-"PRINT"/[[:space:]]*"("				{ return KeywordLexemeAction(createLexicalAnalyzerContext(), PRINT); }
-"IF"/[[:space:]]*"("				{ return KeywordLexemeAction(createLexicalAnalyzerContext(), IF); }
+"PRINT"/[\ ]*"("					{ return KeywordLexemeAction(createLexicalAnalyzerContext(), PRINT); }
+"IF"/[\ ]*"("						{ return KeywordLexemeAction(createLexicalAnalyzerContext(), IF); }
 "ELSE"							    { return KeywordLexemeAction(createLexicalAnalyzerContext(), ELSE); }
 "FOR"       						{ return KeywordLexemeAction(createLexicalAnalyzerContext(), FOR); }
 "IN"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), IN); }
