@@ -36,11 +36,36 @@ static void _output(const unsigned int indentationLevel, const char * const form
 	va_end(arguments);
 }
 
+static void generateFunctionDeclarations(Block * block) {
+	Instruction * current = block->instructions;
+	// Primera pasada: generar solo las funciones
+	while (current != NULL) {
+		if (current->type == FUNCTION_INSTRUCTION_T) {
+			generateFunction(current->function);
+		}
+		current = current->next;
+	}
+}
+
+static void generateNonFunctionInstructions(Block * block) {
+	Instruction * current = block->instructions;
+	// Segunda pasada: generar el resto de las instrucciones
+	while (current != NULL) {
+		if (current->type != FUNCTION_INSTRUCTION_T) {
+			generateInstruction(current);
+		}
+		current = current->next;
+	}
+}
+
 static void generateProgram(Program * program) {
-	// Generar el bloque principal dentro de main()
+	// Primero generar todas las declaraciones de funciones
+	generateFunctionDeclarations(program->block);
+	
+	// Luego generar la función main
 	_output(0, "int main() {\n");
-	generateBlock(program->block);
-	_output(0, "}\n");
+	generateNonFunctionInstructions(program->block);
+	_output(0, "}\n\n");
 }
 
 static void generateBlock(Block * block) {

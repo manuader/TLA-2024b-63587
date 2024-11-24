@@ -200,6 +200,11 @@ Token FunctionIdentifierLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerCon
     }    
 }
 
+Token LoopVariableIdentifierLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
+    _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+    return INT_VAR_NAME;
+}
+
 void BeginStringLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
     _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
     lexicalAnalyzerContext->semanticValue->string = strdup("");

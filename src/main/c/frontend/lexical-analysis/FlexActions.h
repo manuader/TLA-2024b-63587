@@ -37,6 +37,7 @@ Token PunctuationLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, T
 Token AssignmentLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
 Token VariableIdentifierLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
 Token FunctionIdentifierLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
+Token LoopVariableIdentifierLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
 void BeginStringLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
 void StringContentLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);
 void EscapedCharacterLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext);

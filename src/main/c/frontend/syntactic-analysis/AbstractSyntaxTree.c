@@ -304,12 +304,12 @@ bool areTypesEqual(Type* type1, Type* type2) {
 const char* typeToString(enum DataType type) {
 	switch (type) {
 		case INT_T:
-			return "INT";
+			return "int";
 		case BOOL_T:
-			return "BOOL";
+			return "bool";
 		case STRING_T:
-			return "STRING";
+			return "char *";
 		default:
-			return "UNKNOWN";
+			return "void";
 	}
 }

@@ -421,7 +421,7 @@ Function * FunctionSemanticAction(Type * returnType, char * functionName, Parame
     _logSyntacticAnalyzerAction(__FUNCTION__);
 
     Function * function = calloc(1, sizeof(Function));
-    function->returnType = returnType;
+    function->returnType = createType(returnType->type);
     function->functionName = functionName;
     function->parameters = parameters;
     function->block = block;
