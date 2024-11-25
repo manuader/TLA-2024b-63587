@@ -83,6 +83,12 @@ Token UnknownLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
 
 Token KeywordLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token token) {
     _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+    if (token == FOR) {
+        if (_type != NULL) {
+            destroyType(_type);
+        }
+        _type = createType(INT_T);
+    }
     return token;
 }
 

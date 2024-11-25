@@ -11,20 +11,20 @@ void generate(CompilerState * compilerState);
 
 // Nuevas funciones para generación de código
 static void generateProgram(Program * program);
-static void generateBlock(Block * block);
-static void generateInstruction(Instruction * instruction);
-static void generateDeclaration(Declaration * declaration);
-static void generateAssignation(Assignation * assignation);
-static void generatePrint(Print * print);
+static void generateBlock(Block * block, int indentLevel);
+static void generateInstruction(Instruction * instruction, int indentLevel);
+static void generateDeclaration(Declaration * declaration, int indentLevel);
+static void generateAssignation(Assignation * assignation, int indentLevel);
+static void generatePrint(Print * print, int indentLevel);
 static void generateFunction(Function * function);
 static void generateFunctionCall(FunctionCall * functionCall);
-static void generateConditional(Conditional * conditional);
-static void generateLoop(Loop * loop);
+static void generateConditional(Conditional * conditional, int indentLevel);
+static void generateLoop(Loop * loop, int indentLevel);
 static void generateExpression(Expression * expression);
 static void generateArithmeticExpression(ArithmeticExpression * expression);
 static void generateBooleanExpression(BooleanExpression * expression);
 static void generateStringExpression(StringExpression * expression);
-static void generateReturnStatement(ReturnStatement * returnStatement);
+static void generateReturnStatement(ReturnStatement * returnStatement, int indentLevel);
 static void generateParameters(Parameters * parameters);
 static void generateArguments(Arguments * arguments);
 static const char * getTypeString(Type * type);

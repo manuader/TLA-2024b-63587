@@ -1,7 +1,46 @@
 PROGRAM {
-    INT sum = 0;
-    FOR i IN (1, 5) {
-        sum = sum + i;
+    INT suma(INT a, INT b) {
+        RETURN a + b;
     }
-    PRINT(sum);
-}   
+
+    INT multiplicacion(INT a, INT b) {
+        RETURN a * b;
+    }
+
+    STRING saludo(STRING nombre) {
+        PRINT ("Hola ");
+        PRINT (nombre);
+    }
+
+    BOOL esPar(INT num) {
+        RETURN num - ((num / 2) * 2) == 0;
+    }
+
+    INT num = 5;
+    STRING nombre = "Juan";
+
+    saludo(nombre);
+    PRINT ("El producto de ");
+    PRINT (num);
+    PRINT (" y 2 es: ");
+    PRINT (multiplicacion(num, 2));
+
+    IF (esPar(num)) {
+        PRINT (num);
+        PRINT (" es par");
+    } ELSE {
+        PRINT (num);
+        PRINT (" es impar");
+    }
+
+    FOR i IN (1, 3) {
+        PRINT ("Suma de ");
+        PRINT (i);
+        PRINT (" y ");
+        PRINT (num);
+        PRINT (": ");
+        PRINT (suma(i, num));
+    }
+
+    RETURN 0;
+}

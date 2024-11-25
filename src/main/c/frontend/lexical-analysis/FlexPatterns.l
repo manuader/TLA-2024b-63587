@@ -44,7 +44,7 @@
 "IF"/[\ ]*"("						{ return KeywordLexemeAction(createLexicalAnalyzerContext(), IF); }
 "ELSE"							    { return KeywordLexemeAction(createLexicalAnalyzerContext(), ELSE); }
 "FOR"       						{ return KeywordLexemeAction(createLexicalAnalyzerContext(), FOR); }
-"IN"								{ return KeywordLexemeAction(createLexicalAnalyzerContext(), IN); }
+"IN"/[\ ]*"("						{ return KeywordLexemeAction(createLexicalAnalyzerContext(), IN); }
 "RETURN"							{ return KeywordLexemeAction(createLexicalAnalyzerContext(), RETURN); }
 "TRUE"								{ return BooleanLiteralLexemeAction(createLexicalAnalyzerContext(), true); }
 "FALSE"								{ return BooleanLiteralLexemeAction(createLexicalAnalyzerContext(), false); }

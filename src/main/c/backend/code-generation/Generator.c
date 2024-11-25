@@ -52,66 +52,65 @@ static void generateNonFunctionInstructions(Block * block) {
 	// Segunda pasada: generar el resto de las instrucciones
 	while (current != NULL) {
 		if (current->type != FUNCTION_INSTRUCTION_T) {
-			generateInstruction(current);
+			generateInstruction(current, 1);
 		}
 		current = current->next;
 	}
 }
 
 static void generateProgram(Program * program) {
-	// Primero generar todas las declaraciones de funciones
 	generateFunctionDeclarations(program->block);
 	
-	// Luego generar la función main
 	_output(0, "int main() {\n");
-	generateNonFunctionInstructions(program->block);
+	generateBlock(program->block, 1); 
 	_output(0, "}\n\n");
 }
 
-static void generateBlock(Block * block) {
+static void generateBlock(Block * block, int indentLevel) {
 	Instruction * current = block->instructions;
 	while (current != NULL) {
-		generateInstruction(current);
+		generateInstruction(current, indentLevel);
 		current = current->next;
 	}
 }
 
-static void generateInstruction(Instruction * instruction) {
+static void generateInstruction(Instruction * instruction, int indentLevel) {
 	switch (instruction->type) {
 		case DECLARATION_INSTRUCTION_T:
-			generateDeclaration(instruction->declaration);
+			generateDeclaration(instruction->declaration, indentLevel);
 			break;
 		case ASSIGNATION_INSTRUCTION_T:
-			generateAssignation(instruction->assignation);
+			generateAssignation(instruction->assignation, indentLevel);
 			break;
 		case PRINT_INSTRUCTION_T:
-			generatePrint(instruction->print);
+			generatePrint(instruction->print, indentLevel);
 			break;
 		case FUNCTION_INSTRUCTION_T:
-			generateFunction(instruction->function);
 			break;
 		case CONDITIONAL_INSTRUCTION_T:
-			generateConditional(instruction->conditional);
+			generateConditional(instruction->conditional, indentLevel);
 			break;
 		case LOOP_INSTRUCTION_T:
-			generateLoop(instruction->loop);
+			generateLoop(instruction->loop, indentLevel);
 			break;
 		case RETURN_STATEMENT_INSTRUCTION_T:
-			generateReturnStatement(instruction->returnStatement);
+			generateReturnStatement(instruction->returnStatement, indentLevel);
 			break;
 		case EXPRESSION_INSTRUCTION_T:
+			_output(indentLevel, "");
 			generateExpression(instruction->expression);
 			_output(0, ";\n");
 			break;
 		case FUNCTION_CALL_INSTRUCTION_T:
+			_output(indentLevel, "");
 			generateFunctionCall(instruction->functionCall);
 			_output(0, ";\n");
 			break;
 	}
 }
 
-static void generateDeclaration(Declaration * declaration) {
-	_output(1, "%s %s", typeToString(declaration->type->type), declaration->varName);
+static void generateDeclaration(Declaration * declaration, int indentLevel) {
+	_output(indentLevel, "%s %s", typeToString(declaration->type->type), declaration->varName);
 	if (declaration->assignation != NULL) {
 		_output(0, " = ");
 		generateExpression(declaration->assignation->expression);
@@ -119,14 +118,14 @@ static void generateDeclaration(Declaration * declaration) {
 	_output(0, ";\n");
 }
 
-static void generateAssignation(Assignation * assignation) {
-	_output(1, "%s = ", assignation->varName);
+static void generateAssignation(Assignation * assignation, int indentLevel) {
+	_output(indentLevel, "%s = ", assignation->varName);
 	generateExpression(assignation->expression);
 	_output(0, ";\n");
 }
 
-static void generatePrint(Print * print) {
-	_output(1, "printf(\"");
+static void generatePrint(Print * print, int indentLevel) {
+	_output(indentLevel, "printf(\"");
 	
 	switch(print->expression->type) {
 		case ARITHMETIC_EXPR_T:
@@ -244,7 +243,7 @@ static void generateFunction(Function * function) {
 	generateParameters(function->parameters);
 	_output(0, ") {\n");
 	
-	generateBlock(function->block);
+	generateBlock(function->block, 1);
 	
 	_output(0, "}\n\n");
 }
@@ -257,31 +256,31 @@ static void generateFunctionCall(FunctionCall * call) {
 	_output(0, ")");
 }
 
-static void generateConditional(Conditional * conditional) {
-	_output(1, "if (");
+static void generateConditional(Conditional * conditional, int indentLevel) {
+	_output(indentLevel, "if (");
 	generateBooleanExpression(conditional->condition);
 	_output(0, ") {\n");
 	
-	generateBlock(conditional->ifBlock);
+	generateBlock(conditional->ifBlock, indentLevel + 1);
 	
 	if (conditional->elseBlock != NULL) {
-		_output(1, "} else {\n");
-		generateBlock(conditional->elseBlock);
+		_output(indentLevel, "} else {\n");
+		generateBlock(conditional->elseBlock, indentLevel + 1);
 	}
 	
-	_output(1, "}\n");
+	_output(indentLevel, "}\n");
 }
 
-static void generateLoop(Loop * loop) {
-	_output(1, "for (int %s = ", loop->varName);
+static void generateLoop(Loop * loop, int indentLevel) {
+	_output(indentLevel, "for (int %s = ", loop->varName);
 	generateArithmeticExpression(loop->start);
 	_output(0, "; %s <= ", loop->varName);
 	generateArithmeticExpression(loop->end);
 	_output(0, "; %s++) {\n", loop->varName);
 	
-	generateBlock(loop->block);
+	generateBlock(loop->block, indentLevel + 1);
 	
-	_output(1, "}\n");
+	_output(indentLevel, "}\n");
 }
 
 static void generateParameters(Parameters * parameters) {
@@ -333,8 +332,8 @@ static void generateCompareOperator(CompareOperator * op) {
 	}
 }
 
-static void generateReturnStatement(ReturnStatement * returnStatement) {
-	_output(1, "return ");
+static void generateReturnStatement(ReturnStatement * returnStatement, int indentLevel) {
+	_output(indentLevel, "return ");
 	generateExpression(returnStatement->expression);
 	_output(0, ";\n");
 }
