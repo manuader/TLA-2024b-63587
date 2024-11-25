@@ -123,7 +123,6 @@ Token TypeLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext, Token to
     if (_type != NULL) {
         destroyType(_type);
     }
-    logDebugging(_logger, "%s -- TIPO DE VARIABLE: %d ", __FUNCTION__, token);
     _type = createType(token);
     switch (token) {
         case INT_T:
@@ -154,7 +153,6 @@ Token VariableIdentifierLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerCon
     } else {
         // If the identifier does not exist in the symbol table, a new symbol is created
         logDebugging(_logger, "%s -- IDENTIFIER NO ENCONTRADO: %s", __FUNCTION__, identifier);
-        logDebugging(_logger, "%s -- TIPO DE VARIABLE: %d", __FUNCTION__, _type == NULL ? -1 : _type->type);
         if (_type != NULL) {
             identifierType = createType(_type->type);
             addSymbol(identifier, VARIABLE, identifierType);
@@ -192,7 +190,6 @@ Token FunctionIdentifierLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerCon
         if (symbol->kind == FUNCTION) identifierType = symbol->type;
 
     } else {
-        // If the identifier does not exist in the symbol table, a new symbol is created
         return FUNCTION_NAME;
     }
 
@@ -204,11 +201,6 @@ Token FunctionIdentifierLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerCon
         case STRING_T:
             return STRING_FUNCTION_NAME;
     }    
-}
-
-Token LoopVariableIdentifierLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {
-    _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
-    return INT_VAR_NAME;
 }
 
 void BeginStringLexemeAction(LexicalAnalyzerContext * lexicalAnalyzerContext) {

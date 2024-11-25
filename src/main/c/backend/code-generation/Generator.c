@@ -18,8 +18,6 @@ void shutdownGeneratorModule() {
 	}
 }
 
-/** PRIVATE FUNCTIONS */
-
 static char * _indentation(const unsigned int level) {
 	return indentation(_indentationCharacter, level, _indentationSize);
 }
@@ -38,7 +36,6 @@ static void _output(const unsigned int indentationLevel, const char * const form
 
 static void generateFunctionDeclarations(Block * block) {
 	Instruction * current = block->instructions;
-	// Primera pasada: generar solo las funciones
 	while (current != NULL) {
 		if (current->type == FUNCTION_INSTRUCTION_T) {
 			generateFunction(current->function);
@@ -47,20 +44,11 @@ static void generateFunctionDeclarations(Block * block) {
 	}
 }
 
-static void generateNonFunctionInstructions(Block * block) {
-	Instruction * current = block->instructions;
-	// Segunda pasada: generar el resto de las instrucciones
-	while (current != NULL) {
-		if (current->type != FUNCTION_INSTRUCTION_T) {
-			generateInstruction(current, 1);
-		}
-		current = current->next;
-	}
-}
-
 static void generateProgram(Program * program) {
+    // First generate all function declarations
 	generateFunctionDeclarations(program->block);
 	
+    // Then generate main func with the rest of the instructions
 	_output(0, "int main() {\n");
 	generateBlock(program->block, 1); 
 	_output(0, "}\n\n");
@@ -160,24 +148,27 @@ static void generateExpression(Expression * expression) {
 static void generateArithmeticExpression(ArithmeticExpression * expression) {
 	switch(expression->type) {
 		case ADD_T:
-			generateArithmeticExpression(expression->left);
-			_output(0, " + ");
-			generateArithmeticExpression(expression->right);
-			break;
 		case SUB_T:
-			generateArithmeticExpression(expression->left);
-			_output(0, " - ");
-			generateArithmeticExpression(expression->right);
-			break;
 		case MUL_T:
-			generateArithmeticExpression(expression->left);
-			_output(0, " * ");
-			generateArithmeticExpression(expression->right);
-			break;
 		case DIV_T:
+			_output(0, "(");
 			generateArithmeticExpression(expression->left);
-			_output(0, " / ");
+			switch(expression->type) {
+				case ADD_T:
+					_output(0, " + ");
+					break;
+				case SUB_T:
+					_output(0, " - ");
+					break;
+				case MUL_T:
+					_output(0, " * ");
+					break;
+				case DIV_T:
+					_output(0, " / ");
+					break;
+			}
 			generateArithmeticExpression(expression->right);
+			_output(0, ")");
 			break;
 		case INT_LITERAL_T:
 			_output(0, "%d", expression->value);
@@ -194,23 +185,24 @@ static void generateArithmeticExpression(ArithmeticExpression * expression) {
 static void generateBooleanExpression(BooleanExpression * expression) {
 	switch(expression->type) {
 		case AND_T:
-			generateBooleanExpression(expression->left);
-			_output(0, " && ");
-			generateBooleanExpression(expression->right);
-			break;
 		case OR_T:
+			_output(0, "("); 
 			generateBooleanExpression(expression->left);
-			_output(0, " || ");
+			_output(0, expression->type == AND_T ? " && " : " || ");
 			generateBooleanExpression(expression->right);
+			_output(0, ")");
 			break;
 		case NOT_T:
-			_output(0, "!");
+			_output(0, "!("); 
 			generateBooleanExpression(expression->notExpr);
+			_output(0, ")");
 			break;
 		case COMPARISON_T:
+			_output(0, "(");
 			generateArithmeticExpression(expression->leftArith);
 			generateCompareOperator(expression->op);
 			generateArithmeticExpression(expression->rightArith);
+			_output(0, ")"); 
 			break;
 		case BOOL_LITERAL_T:
 			_output(0, "%s", expression->value ? "true" : "false");
@@ -341,14 +333,13 @@ static void generateReturnStatement(ReturnStatement * returnStatement, int inden
 void generate(CompilerState * compilerState) {
 	logDebugging(_logger, "Generating C code...\n");
 	
-	// Generar includes y setup inicial
+	//includes and initial setup
 	_output(0, "%s",
 		"#include <stdio.h>\n"
 		"#include <stdbool.h>\n"
 		"#include <string.h>\n\n"
 	);
 	
-	// Generar el programa
 	generateProgram(compilerState->abstractSyntaxtTree);
 	
 	logDebugging(_logger, "Code generation completed.");
